@@ -165,3 +165,29 @@
 #order-now-a:hover::after {
   width: 100%;
 }
+
+/* Contact layout */
+
+#contact {
+	padding: 30px 0;
+	text-align: center;
+	color: #edf0f1;
+	font-family: "Montserrat";
+}
+
+.contact-list {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+	grid-gap: 40px;
+	margin-top: 50px;
+}
+
+.contact-list div{
+	padding: 40px;
+	border-right: 10px;
+}
+.icon {
+	margin-bottom: 5%;
+	color: #edf0f1;
+	
+}
