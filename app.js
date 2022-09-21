@@ -23,6 +23,10 @@ app.get("/about", function (request, response) {
   response.render("about.hbs");
 });
 
+app.get("/services", function (request, response) {
+  response.render("services.hbs");
+});
+
 
 
 app.listen(6969);
