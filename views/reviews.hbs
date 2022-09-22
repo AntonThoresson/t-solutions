@@ -1,0 +1,25 @@
+<div id="reviews">
+  <h1 class="my-h1"><strong>REVIEWS</strong></h1>
+  <a id="button-style-a" href="">Add a Review</a>
+</div>
+<div class="review-container">
+  {{#if dbError}}
+    <p>Can't display the page now, try again later. </p>
+  {{else}}
+
+    {{#if reviews}}
+      <ul>
+        {{#each reviews}}
+          <div class="review-list">
+            <hr class="footer-hr">
+            <h3>{{name}}</h3>
+            <p>Review: {{description}}</p>
+            <p>Grade: {{grade}}/10</p>
+          </div>
+        {{/each}}
+      </ul>
+    {{else}}
+      <p>There are no reviews</p>
+    {{/if}}
+  {{/if}}
+</div>
