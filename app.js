@@ -64,6 +64,23 @@ app.get("/reviews", function (request, response) {
   });
 });
 
+app.get("/reviews/create-review", function (request, response) {
+  response.render("create-review.hbs");
+});
+
+app.post("/reviews/create-review", function (request, response) {
+  const name = request.body.name;
+  const description = request.body.description;
+  const grade = request.body.grade;
+
+  const query = "INSERT INTO reviews (name, description, grade) VALUES (?, ?, ?)";
+  const values = [name, description, grade];
+
+  db.run(query, values, function (error) {
+    response.redirect("/reviews");
+  });
+});
+
 app.get("/contact", function (request, response) {
   response.render("contact.hbs");
 });
