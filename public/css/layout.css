@@ -231,3 +231,7 @@ h3 {
   margin-top: 15px;
 }
 
+input[type=submit] {
+  cursor: pointer;
+}
+
