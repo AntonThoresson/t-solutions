@@ -252,7 +252,7 @@ input[type=submit] {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  margin-top: 10%;
+  margin-top: 180px;
 }
 
 .login-box h1 {
