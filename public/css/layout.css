@@ -70,6 +70,10 @@
   font-size: 300%;
 }
 
+h3 {
+  text-decoration: underline;
+}
+
 /* Home layout */
 
 #home {
@@ -205,7 +209,25 @@
   text-align: center;
 }
 
-h3 {
-  text-decoration: underline;
+#create-review {
+  color: #edf0f1;
+  font-family: "Montserrat";
+  margin-left: 50px;
+  margin-bottom: 5%;
+}
+
+#form-select {
+  color: #24252a;
+  width: 10%;
+}
+
+#input-name, #input-review {
+  width: 20%;
+}
+
+#post {
+  color: #24252a;
+  font-family: "Montserrat";
+  margin-top: 15px;
 }
 

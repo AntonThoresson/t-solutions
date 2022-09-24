@@ -1,17 +1,58 @@
 <div id="create-review">
-  <h1>CREATE A REVIEW</h1>
+  <h1 class="my-h1"><strong>CREATE A REVIEW</strong></h1>
+  
+    {{#if errorMessages.length}}
+    <p>Couldn't create the review because:</p>
+    <ul>
+      {{#each errorMessages}}
+        <li>{{this}}</li>
+      {{/each}}
+    </ul>
+  {{/if}}
+
   <form method="POST">
-    <div>
-      Name: <input type="text" name="name">
+    <div class="form-group">
+      <label class="form-label" for="input-example-1">Name</label>
+      <input
+        class="form-input"
+        type="text"
+        id="input-name"
+        name="name"
+        placeholder="Name"
+      />
     </div>
-    <div>
-      Review: <input type="text" name="description">
+
+    <div class="form-group">
+      <label class="form-label">Review</label>
+      <textarea
+        class="form-input"
+        name="description"
+        id="input-review"
+        placeholder="Description"
+        rows="3"
+      ></textarea>
     </div>
-    <div>
-      Grade: <input type="number" name="grade" min="1" max="10">
+
+    <div class="form-group">
+      <label class="form-label">Grade</label>
+      <select class="form-select" name="grade" id="form-select">
+        <option>Choose a grade</option>
+        <option>0</option>
+        <option>1</option>
+        <option>2</option>
+        <option>3</option>
+        <option>4</option>
+        <option>5</option>
+        <option>6</option>
+        <option>7</option>
+        <option>8</option>
+        <option>9</option>
+        <option>10</option>
+      </select>
     </div>
-    <div>
-      <input type="submit" value="Add">
+
+    <div id="post">
+      <input type="submit" value="Post">
     </div>
   </form>
 </div>

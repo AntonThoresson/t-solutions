@@ -1,6 +1,13 @@
 const express = require("express");
 const expressHandlebars = require("express-handlebars");
 const sqlite3 = require("sqlite3");
+const expressSession = require("express-session");
+
+const REVIEW_NAME_MAX_LENGTH = 50;
+const REVIEW_GRADE_MAX = 10;
+const REVIEW_GRADE_MIN = 0;
+const ADMIN_USERNAME = "tsolutions";
+const ADMIN_PASSWORD = "password";
 
 const db = new sqlite3.Database("tsolutions-database.db");
 
@@ -25,7 +32,7 @@ app.engine(
 );
 
 app.use("/public", express.static(path.join(__dirname, "/public")));
-app.use(express.static("node_modules/spectre.css/dist"));
+app.use("/node_modules", express.static(path.join(__dirname, "/node_modules")));
 
 app.use(
   express.urlencoded({
@@ -33,8 +40,19 @@ app.use(
   })
 );
 
+app.use(
+  expressSession({
+    saveUninitialized: false,
+    resave: false,
+    secret: "??",
+  })
+);
+
 app.get("/", function (request, response) {
-  response.render("home.hbs");
+  const model = {
+    session: request.session,
+  };
+  response.render("home.hbs", model);
 });
 
 app.get("/about", function (request, response) {
@@ -71,18 +89,90 @@ app.get("/reviews/create-review", function (request, response) {
 app.post("/reviews/create-review", function (request, response) {
   const name = request.body.name;
   const description = request.body.description;
-  const grade = request.body.grade;
+  const grade = parseInt(request.body.grade, 10);
 
-  const query = "INSERT INTO reviews (name, description, grade) VALUES (?, ?, ?)";
-  const values = [name, description, grade];
+  const errorMessages = [];
+  if (name == "") {
+    errorMessages.push("Error: Name can't be empty");
+  } else if (REVIEW_NAME_MAX_LENGTH < name.length) {
+    errorMessages.push(
+      "Error: Name may be at most " + REVIEW_NAME_MAX_LENGTH + " characters long"
+    );
+  }
 
-  db.run(query, values, function (error) {
-    response.redirect("/reviews");
-  });
+  if (isNaN(grade)) {
+    errorMessages.push("Error: Grade must be a number");
+  } else if (grade < REVIEW_GRADE_MIN) {
+    errorMessages.push("Error: Grade can't be negative");
+  } else if (grade > REVIEW_GRADE_MAX) {
+    errorMessages.push("Error: Grade may at most be 10");
+  }
+  if (errorMessages.length == 0) {
+    const query =
+      "INSERT INTO reviews (name, description, grade) VALUES (?, ?, ?)";
+    const values = [name, description, grade];
+
+    db.run(query, values, function (error) {
+      if (error) {
+        errorMessages.push("Error: Internal server error");
+
+        const model = {
+          errorMessages,
+          name,
+          grade,
+        };
+
+        response.render("create-review.hbs", model);
+
+      } else {
+
+        response.redirect("/reviews");
+
+      }
+    });
+
+  } else {
+
+    const model = {
+      errorMessages,
+      name,
+      grade,
+    };
+
+    response.render("create-review.hbs", model);
+
+  }
 });
 
 app.get("/contact", function (request, response) {
   response.render("contact.hbs");
+});
+
+app.get("/login", function (request, response) {
+  response.render("login.hbs");
+});
+
+app.get("/secret-page", function (request, response) {
+  if (isLoggedin == true) {
+    //send back secret page
+  } else {
+    //send back error
+  }
+});
+
+app.post("/login", function (request, response) {
+  const username = request.body.username;
+  const password = request.body.password;
+
+  if (username == ADMIN_USERNAME && password == ADMIN_PASSWORD) {
+    request.session.isLoggedin = true;
+    response.redirect("/");
+  } else {
+    const model = {
+      failedToLogin: true,
+    };
+    response.render("login.hbs");
+  }
 });
 
 app.listen(6969);
