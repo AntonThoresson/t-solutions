@@ -23,6 +23,7 @@ db.run(`
 const app = express();
 
 const path = require("path");
+const { get } = require("https");
 
 app.engine(
   "hbs",
@@ -86,18 +87,15 @@ app.get("/reviews/create-review", function (request, response) {
   response.render("create-review.hbs");
 });
 
-app.post("/reviews/create-review", function (request, response) {
-  const name = request.body.name;
-  const description = request.body.description;
-  const grade = parseInt(request.body.grade, 10);
+function getErrorMessagesForReviews (name, grade) {
 
   const errorMessages = [];
+  
   if (name == "") {
     errorMessages.push("Error: Name can't be empty");
   } else if (REVIEW_NAME_MAX_LENGTH < name.length) {
     errorMessages.push(
-      "Error: Name may be at most " + REVIEW_NAME_MAX_LENGTH + " characters long"
-    );
+      "Error: Name may be at most " + REVIEW_NAME_MAX_LENGTH + " characters long");
   }
 
   if (isNaN(grade)) {
@@ -107,6 +105,16 @@ app.post("/reviews/create-review", function (request, response) {
   } else if (grade > REVIEW_GRADE_MAX) {
     errorMessages.push("Error: Grade may at most be 10");
   }
+  return errorMessages;
+}
+
+app.post("/reviews/create-review", function (request, response) {
+  const name = request.body.name;
+  const description = request.body.description;
+  const grade = parseInt(request.body.grade, 10);
+
+  const errorMessages = getErrorMessagesForReviews(name, grade);
+
   if (errorMessages.length == 0) {
     const query =
       "INSERT INTO reviews (name, description, grade) VALUES (?, ?, ?)";
