@@ -1,4 +1,5 @@
 @import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@500&display=swap");
+@import "https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css";
 
 * {
   box-sizing: border-box;
@@ -68,6 +69,10 @@
 
 .my-h1 {
   font-size: 300%;
+}
+
+.my-p {
+  color: #edf0f1;
 }
 
 h3 {
@@ -209,6 +214,8 @@ h3 {
   text-align: center;
 }
 
+/* Create review layout */
+
 #create-review {
   color: #edf0f1;
   font-family: "Montserrat";
@@ -235,3 +242,62 @@ input[type=submit] {
   cursor: pointer;
 }
 
+/* Login layout*/
+
+.login-box {
+  font-family: "Montserrat";
+  color: #edf0f1;
+  width: 280px;
+  position: relative;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  margin-top: 10%;
+}
+
+.login-box h1 {
+  float: left;
+  margin-bottom: 50px;
+  padding: 13px 0;
+  text-align: center;
+}
+
+.textbox {
+  width: 100%;
+  overflow: hidden;
+  padding: 8px 0;
+  margin: 8px 0;
+  border-bottom: 1px solid #edf0f1
+}
+
+.fa {
+  font-size: 20px;
+}
+
+.textbox i {
+  width: 26px;
+  float: left;
+  text-align: center;
+}
+
+.textbox input {
+  border: none;
+  outline: none;
+  background: none;
+  color: #edf0f1;
+  font-size: 18px;
+  width: 80%;
+  float: left;
+  margin: 0 10px;
+}
+
+#sign-in-btn {
+  width: 100%;
+  background: none;
+  border: 2px solid #edf0f1;
+  color: #edf0f1;
+  padding: 5px;
+  font-size: 18px;
+  cursor: pointer;
+  margin: 12px 0;
+}

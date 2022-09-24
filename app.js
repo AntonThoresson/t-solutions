@@ -165,13 +165,13 @@ app.post("/login", function (request, response) {
   const password = request.body.password;
 
   if (username == ADMIN_USERNAME && password == ADMIN_PASSWORD) {
-    request.session.isLoggedin = true;
+    request.session.isLoggedIn = true;
     response.redirect("/");
   } else {
     const model = {
       failedToLogin: true,
     };
-    response.render("login.hbs");
+    response.render("login.hbs", model);
   }
 });
 
