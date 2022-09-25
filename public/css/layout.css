@@ -168,7 +168,7 @@ h3 {
   position: absolute;
   left: 0;
   bottom: -6px;
-  transition: 0.5s;
+  transition: 0.3s;
 }
 
 #button-style-a:hover::after {
@@ -206,6 +206,11 @@ h3 {
   font-family: "Montserrat";
   color: #edf0f1;
   margin-left: 50px;
+}
+
+#reviews a {
+  margin-right: 30px;
+  display: flexbox;
 }
 
 .review-container {
@@ -301,3 +306,4 @@ input[type=submit] {
   cursor: pointer;
   margin: 12px 0;
 }
+

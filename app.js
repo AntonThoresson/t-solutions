@@ -24,6 +24,7 @@ const app = express();
 
 const path = require("path");
 const { get } = require("https");
+const { brotliDecompress } = require("zlib");
 
 app.engine(
   "hbs",
@@ -45,15 +46,20 @@ app.use(
   expressSession({
     saveUninitialized: false,
     resave: false,
-    secret: "??",
+    secret: "sdfskgfghuerrewfncsdfmnbqwa",
   })
 );
 
+app.use(function(request, response, next){
+  const isLoggedIn = request.session.isLoggedIn;
+
+  response.locals.isLoggedIn = isLoggedIn;
+
+  next();
+});
+
 app.get("/", function (request, response) {
-  const model = {
-    session: request.session,
-  };
-  response.render("home.hbs", model);
+  response.render("home.hbs");
 });
 
 app.get("/about", function (request, response) {
@@ -65,7 +71,7 @@ app.get("/services", function (request, response) {
 });
 
 app.get("/reviews", function (request, response) {
-  const query = "SELECT name, description, grade FROM reviews";
+  const query = "SELECT id, name, description, grade FROM reviews";
   db.all(query, function (error, reviews) {
     if (error) {
       console.log(error);
@@ -152,6 +158,69 @@ app.post("/reviews/create-review", function (request, response) {
   }
 });
 
+app.get("/reviews/delete-review", function (request, response) {
+  const query = "SELECT name FROM reviews";
+  db.all(query, function (error, reviews) {
+    if (error) {
+      console.log(error);
+      const model = {
+        dbError: true,
+      };
+      response.render("reviews.hbs", model);
+    } else {
+      const model = {
+        reviews,
+        dbError: false,
+      };
+      response.render("delete-review.hbs", model);
+    }
+  });
+});
+
+app.post("/reviews/delete-review", function (request, response) {
+  const name = request.body.name;
+
+  const query = "DELETE FROM reviews WHERE name = ?";
+  const values = [name];
+
+  db.run(query, values, function (error) {
+    if (error) {
+      //display error
+      response.render("delete.review.hbs");
+    } else {
+      response.redirect("/reviews");
+    }
+  })
+})
+
+app.get("/reviews/:id", function (request, response) {
+  const id = request.params.id;
+
+  const query = "SELECT * FROM reviews WHERE id = ?";
+  const values = [id];
+
+  db.get(query, values, function (error, review) {
+    const model = {
+      review,
+    }
+    response.render("review.hbs", model);
+  })
+});
+
+app.get("/reviews/update-review/:id", function (request, response) {
+  const id = request.params.id;
+
+  const query = "SELECT * FROM reviews WHERE id = ?";
+  const values = [id];
+
+  db.get(query, values, function (error, review) {
+    const model = {
+      review,
+    }
+    response.render("update-review.hbs", model);
+  })
+})
+
 app.get("/contact", function (request, response) {
   response.render("contact.hbs");
 });
@@ -161,7 +230,7 @@ app.get("/login", function (request, response) {
 });
 
 app.get("/secret-page", function (request, response) {
-  if (isLoggedin == true) {
+  if (isLoggedIn == true) {
     //send back secret page
   } else {
     //send back error
@@ -182,5 +251,7 @@ app.post("/login", function (request, response) {
     response.render("login.hbs", model);
   }
 });
+
+
 
 app.listen(6969);

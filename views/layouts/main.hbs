@@ -21,7 +21,9 @@
         <li id="my-li"><a id="my-a" href="/faq">FAQ</a></li>
         <li id="my-li"><a id="my-a" href="/reviews">Reviews</a></li>
         <li id="my-li"><a id="my-a" href="/contact">Contact</a></li>
-        <li id="my-li"><a id="my-a" href="/login">Login</a></li>
+        {{#unless isLoggedIn}}
+          <li id="my-li"><a id="my-a" href="/login">Login</a></li>
+        {{/unless}}
       </ul>
     </nav>
 

@@ -1,6 +1,9 @@
 <div id="reviews">
   <h1 class="my-h1"><strong>REVIEWS</strong></h1>
   <a id="button-style-a" href="/reviews/create-review">Add a Review</a>
+  {{#if isLoggedIn}}
+    <a id="button-style-a" href="/reviews/delete-review">Delete a Review</a>
+  {{/if}}
 </div>
 <div class="review-container">
   {{#if dbError}}
@@ -11,10 +14,12 @@
       <ul>
         {{#each reviews}}
           <div class="review-list">
-            <hr class="footer-hr">
+            <hr class="footer-hr" />
             <h3>{{name}}</h3>
-            <p>Review: {{description}}</p>
-            <p>Grade: {{grade}}/10</p>
+            <p>Grade: {{grade}}/10</p> 
+            <div>
+              <p><a id="button-style-a" class="review-a" href="/reviews/{{id}}">Read Review</a></p>
+            </div>
           </div>
         {{/each}}
       </ul>

@@ -1,0 +1,28 @@
+<div class="review-container">
+  {{#if dbError}}
+    <p>Can't display the page now, try again later. </p>
+  {{else}}
+
+    {{#if review}}
+      <ul>
+        <div class="review-list">
+          <hr class="footer-hr" />
+          <h3>{{review.name}}</h3>
+          {{#if review.description.length}}
+            <p>Review: {{review.description}}</p>
+          {{else}}
+            <p>Review: No description provided</p>
+          {{/if}}
+          <p>Grade: {{review.grade}}/10</p>
+          {{#if isLoggedIn}}
+          <div>
+            <a id="button-style-a" href="/reviews/update-review/{{review.id}}">Update Review</a>
+          </div>
+          {{/if}}
+        </div>
+      </ul>
+    {{else}}
+      <p>There are no reviews</p>
+    {{/if}}
+  {{/if}}
+</div>
