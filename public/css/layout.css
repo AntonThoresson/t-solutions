@@ -230,7 +230,7 @@ h3 {
 
 #form-select {
   color: #24252a;
-  width: 10%;
+  width: 13%;
 }
 
 #input-name, #input-review {
@@ -307,3 +307,7 @@ input[type=submit] {
   margin: 12px 0;
 }
 
+.review-text {
+  margin-left: 150px;
+  margin-right: 150px;
+}

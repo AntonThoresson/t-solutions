@@ -9,7 +9,9 @@
           <hr class="footer-hr" />
           <h3>{{review.name}}</h3>
           {{#if review.description.length}}
+          <div class="review-text">
             <p>Review: {{review.description}}</p>
+          </div>
           {{else}}
             <p>Review: No description provided</p>
           {{/if}}

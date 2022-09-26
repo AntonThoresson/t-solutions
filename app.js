@@ -50,7 +50,7 @@ app.use(
   })
 );
 
-app.use(function(request, response, next){
+app.use(function (request, response, next) {
   const isLoggedIn = request.session.isLoggedIn;
 
   response.locals.isLoggedIn = isLoggedIn;
@@ -93,15 +93,17 @@ app.get("/reviews/create-review", function (request, response) {
   response.render("create-review.hbs");
 });
 
-function getErrorMessagesForReviews (name, grade) {
-
+function getErrorMessagesForReviews(name, grade) {
   const errorMessages = [];
-  
+
   if (name == "") {
     errorMessages.push("Error: Name can't be empty");
   } else if (REVIEW_NAME_MAX_LENGTH < name.length) {
     errorMessages.push(
-      "Error: Name may be at most " + REVIEW_NAME_MAX_LENGTH + " characters long");
+      "Error: Name may be at most " +
+        REVIEW_NAME_MAX_LENGTH +
+        " characters long"
+    );
   }
 
   if (isNaN(grade)) {
@@ -137,16 +139,11 @@ app.post("/reviews/create-review", function (request, response) {
         };
 
         response.render("create-review.hbs", model);
-
       } else {
-
         response.redirect("/reviews");
-
       }
     });
-
   } else {
-
     const model = {
       errorMessages,
       name,
@@ -154,7 +151,6 @@ app.post("/reviews/create-review", function (request, response) {
     };
 
     response.render("create-review.hbs", model);
-
   }
 });
 
@@ -190,8 +186,8 @@ app.post("/reviews/delete-review", function (request, response) {
     } else {
       response.redirect("/reviews");
     }
-  })
-})
+  });
+});
 
 app.get("/reviews/:id", function (request, response) {
   const id = request.params.id;
@@ -216,10 +212,32 @@ app.get("/reviews/update-review/:id", function (request, response) {
   db.get(query, values, function (error, review) {
     const model = {
       review,
-    }
+    };
+
     response.render("update-review.hbs", model);
-  })
-})
+  });
+});
+
+
+
+app.post("/reviews/update-review/:id", function (request, response) {
+  const updatedName = request.body.name;
+  const updatedDescription = request.body.description;
+  const updatedGrade = parseInt(request.body.grade, 10);
+  const id = request.params.id;
+
+  const query =
+    "UPDATE reviews SET name = ?, description = ?, grade = ? WHERE id = ?";
+  const values = [updatedName, updatedDescription, updatedGrade, id];
+
+  db.run(query, values, function (error) {
+    if (error) {
+      //display error
+    } else {
+      response.redirect("/reviews");
+    }
+  });
+});
 
 app.get("/contact", function (request, response) {
   response.render("contact.hbs");
@@ -251,7 +269,5 @@ app.post("/login", function (request, response) {
     response.render("login.hbs", model);
   }
 });
-
-
 
 app.listen(6969);
