@@ -20,6 +20,14 @@ db.run(`
   )
 `);
 
+db.run(`
+  CREATE TABLE IF NOT EXISTS faq (
+    id INTEGER PRIMARY KEY,
+    question TEXT,
+    answer TEXT
+  )
+`);
+
 const app = express();
 
 const path = require("path");
@@ -68,6 +76,41 @@ app.get("/about", function (request, response) {
 
 app.get("/services", function (request, response) {
   response.render("services.hbs");
+});
+
+app.get("/faqs", function (request, response) {
+  const query = "SELECT * FROM faq";
+
+  db.all(query, function (error, faqs) {
+    if (error) {
+      //display error
+    } else {
+      const model = {
+        faqs,
+      };
+      response.render("faqs.hbs", model);
+    }
+  });
+});
+
+
+app.get("/faqs/create-faq", function (request, response) {
+  response.render("create-faq.hbs");
+})
+
+app.post("/faqs/create-faq", function (request, response) {
+  const question = request.body.question;
+  const answer = request.body.answer;
+  const query = "INSERT INTO faq (question, answer) VALUES (?, ?)";
+  const values = [question, answer];
+
+  db.run(query, values, function (error) {
+    if (error) {
+      //display error
+    } else {
+      response.redirect("/faqs");
+    }
+  });
 });
 
 app.get("/reviews", function (request, response) {
@@ -198,9 +241,9 @@ app.get("/reviews/:id", function (request, response) {
   db.get(query, values, function (error, review) {
     const model = {
       review,
-    }
+    };
     response.render("review.hbs", model);
-  })
+  });
 });
 
 app.get("/reviews/update-review/:id", function (request, response) {
@@ -217,8 +260,6 @@ app.get("/reviews/update-review/:id", function (request, response) {
     response.render("update-review.hbs", model);
   });
 });
-
-
 
 app.post("/reviews/update-review/:id", function (request, response) {
   const updatedName = request.body.name;

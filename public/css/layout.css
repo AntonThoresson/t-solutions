@@ -75,9 +75,6 @@
   color: #edf0f1;
 }
 
-h3 {
-  text-decoration: underline;
-}
 
 /* Home layout */
 
@@ -311,3 +308,37 @@ input[type=submit] {
   margin-left: 150px;
   margin-right: 150px;
 }
+
+.faq-question {
+  display: flex;
+}
+
+.faq-question h4 {
+  margin-top: 5px;
+  margin-left: 10px;
+}
+
+.faq-answer {
+  display: flex;
+  margin-top: 15px;
+  color: #b4b4b4
+}
+
+.faq-answer h4 {
+  margin-left: 10px;
+  margin-top: 14px;
+  font-size: 15px;
+}
+
+.edit-button {
+  margin-bottom: 10px;
+}
+
+
+
+/*
+#my-h4 {
+  margin-top: 5px;
+  margin-left: 10px;
+}*/
+
