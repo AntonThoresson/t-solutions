@@ -93,6 +93,39 @@ app.get("/faqs", function (request, response) {
   });
 });
 
+app.get("/faq/:id", function (request, response) {
+  const id = request.params.id;
+
+  const query = "SELECT * FROM faq WHERE id = ?";
+  const values = [id];
+
+  db.get(query, values, function (error, faq) {
+    if (error) {
+      //display error
+    } else {
+      const model = {
+        faq,
+      };
+      response.render("faq.hbs", model);
+    }
+  });
+});
+
+app.post("/faq/delete/:id", function (request, response) {
+  const id = request.params.id;
+
+  const query = "DELETE FROM faq WHERE id = ?";
+  const values = [id];
+
+  db.run(query, values, function (error) {
+    if (error) {
+      //display error
+      console.log(error);
+    } else {
+      response.redirect("/faqs");
+    }
+  });
+});
 
 app.get("/faqs/create-faq", function (request, response) {
   response.render("create-faq.hbs");

@@ -4,7 +4,7 @@
   <a id="button-style-a" href="/faqs/create-faq">Create FAQ</a>
   {{/if}}
   <div class="faq-container">
-    {{#if faqs.length}}
+    {{#if faqs}}
       <ul>
         {{#each faqs}}
           <div class="faq-question">
@@ -17,7 +17,7 @@
           </div>
           {{#if ../isLoggedIn}}
             <div class="edit-button">
-              <a id="button-style-a" href="">Edit</a>
+              <a id="button-style-a" href="/faq/{{id}}">Edit</a>
             </div>
           {{/if}}
         {{/each}}
