@@ -1,0 +1,33 @@
+<div id="create-review">
+  {{#if isLoggedIn}}
+    <form method="POST">
+      <div class="form-group">
+        <label class="form-label" for="input-example-1">Question</label>
+        <input
+          class="form-input"
+          type="text"
+          id="input-name"
+          name="question"
+          value="{{faq.question}}"
+          placeholder="Question"
+        />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Answer</label>
+        <textarea
+          class="form-input"
+          name="answer"
+          id="input-review"
+          placeholder="Answer"
+          rows="3"
+        >{{faq.answer}}</textarea>
+      </div>
+
+      <div id="post">
+        <input type="submit" value="Update" />
+      </div>
+    </form>
+  {{/if}}
+
+</div>

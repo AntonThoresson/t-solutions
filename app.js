@@ -146,6 +146,41 @@ app.post("/faqs/create-faq", function (request, response) {
   });
 });
 
+app.get("/update-faq/:id", function (request, response) {
+  const id = request.params.id;
+
+  const query = "SELECT * FROM faq WHERE id = ?";
+  const values = [id];
+
+  db.get(query, values, function (error, faq) {
+    if (error) {
+      //display error
+    } else {
+      const model = {
+        faq,
+      }
+      response.render("update-faq.hbs", model);
+    }
+  })
+})
+
+app.post("/update-faq/:id", function (request, response) {
+  const updatedQuestion = request.body.question;
+  const updatedAnswer = request.body.answer;
+  const id = request.params.id;
+
+  const query = "UPDATE faq SET question = ?, answer = ? WHERE id = ?";
+  const values = [updatedQuestion, updatedAnswer, id];
+
+  db.run(query, values, function (error) {
+    if (error) {
+      //display error
+    } else {
+      response.redirect("/faqs");
+    }
+  })
+})
+
 app.get("/reviews", function (request, response) {
   const query = "SELECT id, name, description, grade FROM reviews";
   db.all(query, function (error, reviews) {

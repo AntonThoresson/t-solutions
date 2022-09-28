@@ -334,6 +334,14 @@ input[type=submit] {
   margin-bottom: 10px;
 }
 
+#faq-edit {
+  display: flex;
+  margin-left: 15px;
+}
+
+#faq-edit a{
+  margin-left: 25px;
+}
 
 
 /*

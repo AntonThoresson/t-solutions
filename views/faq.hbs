@@ -10,10 +10,13 @@
           <h4 id="answer-h4">{{faq.answer}}</h4>
         </div>
       </ul>
-      <div id="post">
+      <div id="faq-edit">
         <form action="/faq/delete/{{faq.id}}" method="POST">
-          <input type="submit" value="Delete">
+          <input  type="submit" value="Delete">
         </form>
+        <a id="button-style-a" href="/update-faq/{{faq.id}}">Update</a>
       </div>
+
   {{/if}}
 </div>
+<!-- fixa delete buttonen -->
