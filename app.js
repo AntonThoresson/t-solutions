@@ -151,6 +151,41 @@ app.post("/service/delete/:id", function (request, response) {
   });
 });
 
+app.get("/update-service/:id", function (request, response) {
+  const id = request.params.id;
+
+  const query = "SELECT * FROM services WHERE id = ?";
+  const values = [id];
+
+  db.get(query, values, function (error, service) {
+    if (error) {
+      //display error
+    } else {
+      const model = {
+        service,
+      };
+      response.render("update-service.hbs", model);
+    }
+  });
+});
+
+app.post("/update-service/:id", function (request, response) {
+  const updatedName = request.body.name;
+  const updatedDescription = request.body.description;
+  const id = request.params.id;
+
+  const query = "UPDATE services SET name = ?, description = ? WHERE id = ?";
+  const values = [updatedName, updatedDescription, id];
+
+  db.run(query, values, function (error) {
+    if (error) {
+      //display error
+    } else {
+      response.redirect("/services");
+    }
+  });
+});
+
 app.get("/faqs", function (request, response) {
   const query = "SELECT * FROM faq";
 
