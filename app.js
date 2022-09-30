@@ -28,6 +28,14 @@ db.run(`
   )
 `);
 
+db.run(`
+  CREATE TABLE IF NOT EXISTS services (
+    id INTEGER PRIMARY KEY,
+    name TEXT,
+    description TEXT
+  )
+`);
+
 const app = express();
 
 const path = require("path");
