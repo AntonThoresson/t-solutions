@@ -117,6 +117,40 @@ app.post("/services/create-service", function (request, response) {
   });
 });
 
+app.get("/service/:id", function (request, response) {
+  const id = request.params.id;
+
+
+  const query = "SELECT * FROM services WHERE id = ?";
+  const values = [id];
+
+  db.get(query, values, function (error, service) {
+    if (error) {
+      //display error
+    } else {
+      const model = {
+        service,
+      };
+      response.render("service.hbs", model);
+    }
+  });
+});
+
+app.post("/service/delete/:id", function (request, response) {
+  const id = request.params.id;
+
+  const query = "DELETE FROM services WHERE id = ?";
+  const values = [id];
+
+  db.run(query, values, function (error) {
+    if (error) {
+      //display error
+    } else {
+      response.redirect("/services");
+    }
+  });
+});
+
 app.get("/faqs", function (request, response) {
   const query = "SELECT * FROM faq";
 
@@ -131,6 +165,7 @@ app.get("/faqs", function (request, response) {
     }
   });
 });
+
 
 app.get("/faq/:id", function (request, response) {
   const id = request.params.id;

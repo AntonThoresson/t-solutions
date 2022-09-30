@@ -125,6 +125,15 @@
 	margin-top: 50px;
 }
 
+.specific-list {
+  color: #edf0f1;
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+	grid-gap: 40px;
+  margin-right: 850;
+  margin-left: 40px;
+}
+
 #services .container h1 {
 	text-align: center;
 	color: #edf0f1;
@@ -174,6 +183,21 @@
 
 #button-style-a:hover::after {
   width: 100%;
+}
+
+#service-edit {
+  display: flex;
+  
+}
+
+#service-edit a{
+  margin-left: 25px;
+}
+
+#service-edit input {
+  background: none;
+  border: none;
+  color: #edf0f1;
 }
 
 /* Contact layout */
