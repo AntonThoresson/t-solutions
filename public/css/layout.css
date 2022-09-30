@@ -309,6 +309,8 @@ input[type=submit] {
   margin-right: 150px;
 }
 
+/* Main FAQ page */
+
 .faq-question {
   display: flex;
 }
@@ -330,6 +332,8 @@ input[type=submit] {
   font-size: 15px;
 }
 
+/* Indvidual FAQ page for admin */
+
 .edit-button {
   margin-bottom: 10px;
 }
@@ -343,10 +347,9 @@ input[type=submit] {
   margin-left: 25px;
 }
 
-
-/*
-#my-h4 {
-  margin-top: 5px;
-  margin-left: 10px;
-}*/
+#faq-edit input {
+  background: none;
+  border: none;
+  color: #edf0f1;
+}
 
