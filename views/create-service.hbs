@@ -1,0 +1,40 @@
+<div id="create-review">
+  <h1 class="my-h1"><strong>CREATE SERVICE</strong></h1>
+  
+    {{#if errorMessages.length}}
+    <p>Couldn't create the review because:</p>
+    <ul>
+      {{#each errorMessages}}
+        <li>{{this}}</li>
+      {{/each}}
+    </ul>
+  {{/if}}
+
+  <form method="POST">
+    <div class="form-group">
+      <label class="form-label" for="input-example-1">Name</label>
+      <input
+        class="form-input"
+        type="text"
+        id="input-name"
+        name="name"
+        placeholder="Name"
+      />
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Description</label>
+      <textarea
+        class="form-input"
+        name="description"
+        id="input-review"
+        placeholder="Description"
+        rows="3"
+      ></textarea>
+    </div>
+
+    <div id="post">
+      <input type="submit" value="Post">
+    </div>
+  </form>
+</div>

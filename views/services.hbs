@@ -1,25 +1,25 @@
 <div id="services">
   <div class="container">
     <h1 class="my-h1"><strong>SERVICES</strong></h1>
-    <div class="list">
-      <div>
-        <h2>Automation Robotics</h2>
-        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Placeat ut
-          perspiciatis earum. Consequuntur unde, quis sit quibusdam dignissimos.</p>
-        <p class="button-style-p"><a id="button-style-a" href="/contact">ORDER NOW</a></p>
+    {{#if isLoggedIn}}
+      <div class="create-service-button">
+        <a id="button-style-a" href="/services/create-service">Create Service</a>
       </div>
-      <div>
-        <h2>Integrate a New WMS</h2>
-        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Placeat ut
-          perspiciatis earum. Consequuntur unde, quis sit quibusdam dignissimos.</p>
-        <p class="button-style-p"><a id="button-style-a" href="/contact">ORDER NOW</a></p>
+    {{/if}}
+    {{#if services}}
+      <div class="list">
+        {{#each services}}
+          <div>
+            <h2>{{name}}</h2>
+            <p>{{description}}</p>
+            <a id="button-style-a" href="">Edit</a>
+            <p class="button-style-p"><a
+                id="button-style-a"
+                href="/contact"
+              >ORDER NOW</a></p>
+          </div>
+        {{/each}}
       </div>
-      <div>
-        <h2>Optimized Logistics</h2>
-        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Placeat ut
-          perspiciatis earum. Consequuntur unde, quis sit quibusdam dignissimos.</p>
-        <p class="button-style-p"><a id="button-style-a" href="/contact">ORDER NOW</a></p>
-      </div>
-    </div>
+    {{/if}}
   </div>
 </div>

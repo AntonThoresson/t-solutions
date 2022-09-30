@@ -83,7 +83,38 @@ app.get("/about", function (request, response) {
 });
 
 app.get("/services", function (request, response) {
-  response.render("services.hbs");
+  const query = "SELECT * FROM services";
+
+  db.all(query, function (error, services) {
+    if (error){
+      //display error
+    } else {
+      const model = {
+        services,
+      };
+      response.render("services.hbs", model);
+    }
+  });
+});
+
+app.get("/services/create-service", function (request, response) {
+  response.render("create-service.hbs");
+});
+
+app.post("/services/create-service", function (request, response) {
+  const name = request.body.name;
+  const description = request.body.description;
+
+  const query = "INSERT INTO services (name, description) VALUES (?, ?)";
+  const values =[name, description];
+
+  db.run(query, values, function (error) {
+    if (error){
+      //display error
+    } else {
+      response.redirect("/services");
+    }
+  });
 });
 
 app.get("/faqs", function (request, response) {
