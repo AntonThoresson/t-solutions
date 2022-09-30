@@ -12,7 +12,9 @@
           <div>
             <h2>{{name}}</h2>
             <p>{{description}}</p>
-            <a id="button-style-a" href="/service/{{id}}">Edit</a>
+            {{#if ../isLoggedIn}}
+              <a id="button-style-a" href="/service/{{id}}">Edit</a>
+            {{/if}}
             <p class="button-style-p"><a
                 id="button-style-a"
                 href="/contact"
