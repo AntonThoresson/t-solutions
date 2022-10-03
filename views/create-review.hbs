@@ -1,8 +1,7 @@
 <div id="create-review">
   <h1 class="my-h1"><strong>CREATE A REVIEW</strong></h1>
   
-    {{#if errorMessages.length}}
-    <p>Couldn't create the review because:</p>
+  {{#if errorMessages.length}}
     <ul>
       {{#each errorMessages}}
         <li>{{this}}</li>
@@ -31,7 +30,8 @@
         id="input-review"
         placeholder="Description"
         rows="3"
-      ></textarea>
+        
+      >{{description}}</textarea>
     </div>
 
     <div class="form-group">

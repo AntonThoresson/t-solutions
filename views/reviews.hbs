@@ -1,13 +1,10 @@
 <div id="reviews">
   <h1 class="my-h1"><strong>REVIEWS</strong></h1>
   <a id="button-style-a" href="/reviews/create-review">Add a Review</a>
-  {{#if isLoggedIn}}
-    <a id="button-style-a" href="/reviews/delete-review">Delete a Review</a>
-  {{/if}}
 </div>
 <div class="review-container">
   {{#if dbError}}
-    <p>Can't display the page now, try again later. </p>
+    <p>Error: Internal server error.</p>
   {{else}}
 
     {{#if reviews}}
@@ -16,14 +13,12 @@
           <div class="review-list">
             <hr class="footer-hr" />
             <h3>{{name}}</h3>
-            <p>Grade: {{grade}}/10</p> 
+            <p>Grade: {{grade}}/10</p>
             <div>
-              <p><a id="button-style-a" class="review-a" href="/reviews/{{id}}">Read Review</a></p>
+              <p>
+                <a id="button-style-a" class="review-a" href="/review/{{id}}">Read Review</a>
+              </p>
             </div>
-
-            {{#if ../isLoggedIn}}
-
-            {{/if}}
           </div>
         {{/each}}
       </ul>

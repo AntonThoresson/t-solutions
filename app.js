@@ -4,8 +4,10 @@ const sqlite3 = require("sqlite3");
 const expressSession = require("express-session");
 
 const REVIEW_NAME_MAX_LENGTH = 50;
+const REVIEW_NAME_MIN_LENGTH = 2;
 const REVIEW_GRADE_MAX = 10;
 const REVIEW_GRADE_MIN = 0;
+const REVIEW_DESCRIPTION_MAX_LENGTH = 500;
 const ADMIN_USERNAME = "tsolutions";
 const ADMIN_PASSWORD = "password";
 
@@ -290,11 +292,33 @@ app.post("/update-faq/:id", function (request, response) {
   })
 })
 
+function getErrorMessagesForReviews(name, description, grade) {
+  const errorMessages = [];
+
+  if (name.length < REVIEW_NAME_MIN_LENGTH) {
+    errorMessages.push("Error: Name can't be less than " + REVIEW_NAME_MIN_LENGTH + " characters long");
+  } else if (REVIEW_NAME_MAX_LENGTH < name.length) {
+    errorMessages.push("Error: Name may be at most " + REVIEW_NAME_MAX_LENGTH + " characters long");
+  }
+
+  if (description.length > REVIEW_DESCRIPTION_MAX_LENGTH){
+    errorMessages.push("Error: Review may be at most" + REVIEW_DESCRIPTION_MAX_LENGTH + " characters long")
+  }
+
+  if (isNaN(grade)) {
+    errorMessages.push("Error: Grade must be a number");
+  } else if (grade < REVIEW_GRADE_MIN) {
+    errorMessages.push("Error: Grade can't be negative");
+  } else if (grade > REVIEW_GRADE_MAX) {
+    errorMessages.push("Error: Grade may at most be 10");
+  }
+  return errorMessages;
+}
+
 app.get("/reviews", function (request, response) {
   const query = "SELECT id, name, description, grade FROM reviews";
   db.all(query, function (error, reviews) {
     if (error) {
-      console.log(error);
       const model = {
         dbError: true,
       };
@@ -313,39 +337,18 @@ app.get("/reviews/create-review", function (request, response) {
   response.render("create-review.hbs");
 });
 
-function getErrorMessagesForReviews(name, grade) {
-  const errorMessages = [];
 
-  if (name == "") {
-    errorMessages.push("Error: Name can't be empty");
-  } else if (REVIEW_NAME_MAX_LENGTH < name.length) {
-    errorMessages.push(
-      "Error: Name may be at most " +
-        REVIEW_NAME_MAX_LENGTH +
-        " characters long"
-    );
-  }
-
-  if (isNaN(grade)) {
-    errorMessages.push("Error: Grade must be a number");
-  } else if (grade < REVIEW_GRADE_MIN) {
-    errorMessages.push("Error: Grade can't be negative");
-  } else if (grade > REVIEW_GRADE_MAX) {
-    errorMessages.push("Error: Grade may at most be 10");
-  }
-  return errorMessages;
-}
 
 app.post("/reviews/create-review", function (request, response) {
   const name = request.body.name;
   const description = request.body.description;
   const grade = parseInt(request.body.grade, 10);
 
-  const errorMessages = getErrorMessagesForReviews(name, grade);
+  const errorMessages = getErrorMessagesForReviews(name, description, grade);
 
   if (errorMessages.length == 0) {
     const query =
-      "INSERT INTO reviews (name, description, grade) VALUES (?, ?, ?)";
+      "INSERT INTO review (name, description, grade) VALUES (?, ?, ?)";
     const values = [name, description, grade];
 
     db.run(query, values, function (error) {
@@ -355,6 +358,7 @@ app.post("/reviews/create-review", function (request, response) {
         const model = {
           errorMessages,
           name,
+          description,
           grade,
         };
 
@@ -367,6 +371,7 @@ app.post("/reviews/create-review", function (request, response) {
     const model = {
       errorMessages,
       name,
+      description,
       grade,
     };
 
@@ -393,23 +398,25 @@ app.get("/reviews/delete-review", function (request, response) {
   });
 });
 
-app.post("/reviews/delete-review", function (request, response) {
-  const name = request.body.name;
+app.post("/review/delete/:id", function (request, response) {
+  const id = request.params.id;
 
-  const query = "DELETE FROM reviews WHERE name = ?";
-  const values = [name];
+  const query = "DELETE FROM reviews WHERE id = ?";
+  const values = [id];
 
   db.run(query, values, function (error) {
     if (error) {
-      //display error
-      response.render("delete.review.hbs");
+      const model = {
+        dbError: true,
+      };
+      response.render("review.hbs", model);
     } else {
       response.redirect("/reviews");
     }
   });
 });
 
-app.get("/reviews/:id", function (request, response) {
+app.get("/review/:id", function (request, response) {
   const id = request.params.id;
 
   const query = "SELECT * FROM reviews WHERE id = ?";
@@ -423,38 +430,68 @@ app.get("/reviews/:id", function (request, response) {
   });
 });
 
-app.get("/reviews/update-review/:id", function (request, response) {
+app.get("/update-review/:id", function (request, response) {
   const id = request.params.id;
 
   const query = "SELECT * FROM reviews WHERE id = ?";
   const values = [id];
 
   db.get(query, values, function (error, review) {
-    const model = {
-      review,
-    };
-
+    if (error){
+      const model = {
+        dbError: true,
+      };
+      response.render("update-review.hbs", model);
+    } else {
+      const model = {
+        review,
+        dbError: false,
+      };
     response.render("update-review.hbs", model);
+    }
   });
 });
 
-app.post("/reviews/update-review/:id", function (request, response) {
+app.post("/update-review/:id", function (request, response) {
   const updatedName = request.body.name;
   const updatedDescription = request.body.description;
   const updatedGrade = parseInt(request.body.grade, 10);
   const id = request.params.id;
 
-  const query =
-    "UPDATE reviews SET name = ?, description = ?, grade = ? WHERE id = ?";
-  const values = [updatedName, updatedDescription, updatedGrade, id];
+  const errorMessages = getErrorMessagesForReviews(updatedName, updatedDescription, updatedGrade);
+  
+  if (errorMessages.length == 0) {
+    const query =
+      "UPDATE reviews SET name = ?, description = ?, grade = ? WHERE id = ?";
+    const values = [updatedName, updatedDescription, updatedGrade, id];
 
-  db.run(query, values, function (error) {
-    if (error) {
-      //display error
-    } else {
-      response.redirect("/reviews");
-    }
-  });
+    db.run(query, values, function (error) {
+      if (error) {
+        errorMessages.push("Error: Internal server error");
+        const model = {
+          errorMessages,
+          review: {
+           name: updatedName,
+           description: updatedDescription,
+           grade: updatedGrade,
+          },
+        };
+        response.render("update-review.hbs", model);
+      } else {
+        response.redirect("/reviews");
+      }
+    });
+  } else {
+    const model = {
+      errorMessages,
+      review: {
+        name: updatedName,
+        description: updatedDescription,
+        grade: updatedGrade,
+      },
+    };
+    response.render("update-review.hbs", model);
+  }
 });
 
 app.get("/contact", function (request, response) {

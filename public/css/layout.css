@@ -244,6 +244,13 @@
   text-align: center;
 }
 
+#review-delete input {
+  margin-top: 17px;
+  background: none;
+  border: none;
+  color: #edf0f1;
+}
+
 /* Create review layout */
 
 #create-review {

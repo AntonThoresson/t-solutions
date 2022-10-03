@@ -1,6 +1,6 @@
 <div class="review-container">
   {{#if dbError}}
-    <p>Can't display the page now, try again later. </p>
+    <p>Error: Internal server error</p>
   {{else}}
 
     {{#if review}}
@@ -9,17 +9,22 @@
           <hr class="footer-hr" />
           <h3>{{review.name}}</h3>
           {{#if review.description.length}}
-          <div class="review-text">
-            <p>Review: {{review.description}}</p>
-          </div>
+            <div class="review-text">
+              <p>Review: {{review.description}}</p>
+            </div>
           {{else}}
             <p>Review: No description provided</p>
           {{/if}}
           <p>Grade: {{review.grade}}/10</p>
           {{#if isLoggedIn}}
-          <div>
-            <a id="button-style-a" href="/reviews/update-review/{{review.id}}">Update Review</a>
-          </div>
+            <div>
+              <a id="button-style-a" href="/update-review/{{review.id}}">Update Review</a>
+            </div>
+            <div id="review-delete">
+              <form action="/review/delete/{{review.id}}" method="POST">
+                <input type="submit" value="Delete" />
+              </form>
+            </div>
           {{/if}}
         </div>
       </ul>
