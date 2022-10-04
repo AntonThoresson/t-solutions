@@ -10,6 +10,8 @@ const REVIEW_GRADE_MIN = 0;
 const REVIEW_DESCRIPTION_MAX_LENGTH = 500;
 const ADMIN_USERNAME = "tsolutions";
 const ADMIN_PASSWORD = "password";
+const DATABASE_ERROR_MESSAGE = "Error: Internal server error";
+const AUTHORIZATION_ERROR_MESSAGE = "Error: You don't have admin access";
 
 const db = new sqlite3.Database("tsolutions-database.db");
 
@@ -348,12 +350,12 @@ app.post("/reviews/create-review", function (request, response) {
 
   if (errorMessages.length == 0) {
     const query =
-      "INSERT INTO review (name, description, grade) VALUES (?, ?, ?)";
+      "INSERT INTO reviews (name, description, grade) VALUES (?, ?, ?)";
     const values = [name, description, grade];
 
     db.run(query, values, function (error) {
       if (error) {
-        errorMessages.push("Error: Internal server error");
+        errorMessages.push(DATABASE_ERROR_MESSAGE);
 
         const model = {
           errorMessages,
@@ -379,24 +381,6 @@ app.post("/reviews/create-review", function (request, response) {
   }
 });
 
-app.get("/reviews/delete-review", function (request, response) {
-  const query = "SELECT name FROM reviews";
-  db.all(query, function (error, reviews) {
-    if (error) {
-      console.log(error);
-      const model = {
-        dbError: true,
-      };
-      response.render("reviews.hbs", model);
-    } else {
-      const model = {
-        reviews,
-        dbError: false,
-      };
-      response.render("delete-review.hbs", model);
-    }
-  });
-});
 
 app.post("/review/delete/:id", function (request, response) {
   const id = request.params.id;
@@ -423,16 +407,27 @@ app.get("/review/:id", function (request, response) {
   const values = [id];
 
   db.get(query, values, function (error, review) {
-    const model = {
-      review,
-    };
-    response.render("review.hbs", model);
+    if (error) {
+      const model = {
+        dbError: true,
+        review,
+      };
+      response.render("review.hbs", model);
+    } else {
+      const model = {
+        dbError: false,
+        review,
+      };
+      response.render("review.hbs", model);
+    }
   });
 });
 
 app.get("/update-review/:id", function (request, response) {
   const id = request.params.id;
-
+  if(!request.session.isLoggedIn){
+    response.redirect("/login");
+  }
   const query = "SELECT * FROM reviews WHERE id = ?";
   const values = [id];
 
@@ -459,6 +454,10 @@ app.post("/update-review/:id", function (request, response) {
   const id = request.params.id;
 
   const errorMessages = getErrorMessagesForReviews(updatedName, updatedDescription, updatedGrade);
+
+  if (!request.session.isLoggedIn) {
+    errorMessages.push(AUTHORIZATION_ERROR_MESSAGE);
+  }
   
   if (errorMessages.length == 0) {
     const query =
@@ -467,7 +466,7 @@ app.post("/update-review/:id", function (request, response) {
 
     db.run(query, values, function (error) {
       if (error) {
-        errorMessages.push("Error: Internal server error");
+        errorMessages.push(DATABASE_ERROR_MESSAGE);
         const model = {
           errorMessages,
           review: {
