@@ -8,10 +8,17 @@ const REVIEW_NAME_MIN_LENGTH = 2;
 const REVIEW_GRADE_MAX = 10;
 const REVIEW_GRADE_MIN = 0;
 const REVIEW_DESCRIPTION_MAX_LENGTH = 500;
+
 const ADMIN_USERNAME = "tsolutions";
 const ADMIN_PASSWORD = "password";
+
 const DATABASE_ERROR_MESSAGE = "Error: Internal server error";
 const AUTHORIZATION_ERROR_MESSAGE = "Error: You don't have admin access";
+
+const FAQ_QUESTION_MAX_LENGTH = 300;
+const FAQ_QUESTION_MIN_LENGTH = 5;
+const FAQ_ANSWER_MAX_LENGTH = 300;
+const FAQ_ANSWER_MIN_LENGTH = 2;
 
 const db = new sqlite3.Database("tsolutions-database.db");
 
@@ -45,6 +52,7 @@ const app = express();
 const path = require("path");
 const { get } = require("https");
 const { brotliDecompress } = require("zlib");
+const { response } = require("express");
 
 app.engine(
   "hbs",
@@ -190,14 +198,37 @@ app.post("/update-service/:id", function (request, response) {
   });
 });
 
+function getErrorMessagesForFaqs(question, answer) {
+  const errorMessages = [];
+
+  if (question.length > FAQ_QUESTION_MAX_LENGTH) {
+    errorMessages.push("Error: Question may at most be " + FAQ_QUESTION_MAX_LENGTH + " characters long");
+  } else if (question.length < FAQ_ANSWER_MIN_LENGTH) {
+    errorMessages.push("Error: Question can't be less than " + FAQ_QUESTION_MIN_LENGTH + " characters long");
+  }
+
+  if (answer.length > FAQ_ANSWER_MAX_LENGTH) {
+    errorMessages.push("Error: Answer may at most be " + FAQ_ANSWER_MAX_LENGTH + " characters long");
+  } else if (answer.length < FAQ_ANSWER_MIN_LENGTH) {
+    errorMessages.push("Error: Answer can't be less than " + FAQ_ANSWER_MIN_LENGTH +  " charcters long");
+  }
+
+  return errorMessages;
+}
+
 app.get("/faqs", function (request, response) {
   const query = "SELECT * FROM faq";
 
   db.all(query, function (error, faqs) {
     if (error) {
-      //display error
+      const model = {
+        dbError: true,
+        faqs,
+      };
+      response.render("faqs.hbs", model);
     } else {
       const model = {
+        dbError: false,
         faqs,
       };
       response.render("faqs.hbs", model);
@@ -209,14 +240,23 @@ app.get("/faqs", function (request, response) {
 app.get("/faq/:id", function (request, response) {
   const id = request.params.id;
 
+  if (!request.session.isLoggedIn) {
+    response.redirect("/login");
+  }
+
   const query = "SELECT * FROM faq WHERE id = ?";
   const values = [id];
 
   db.get(query, values, function (error, faq) {
     if (error) {
-      //display error
+      const model = {
+        dbError: true,
+        faq,
+      };
+      response.render("faq.hbs", model);
     } else {
       const model = {
+        dbError: false,
         faq,
       };
       response.render("faq.hbs", model);
@@ -232,8 +272,10 @@ app.post("/faq/delete/:id", function (request, response) {
 
   db.run(query, values, function (error) {
     if (error) {
-      //display error
-      console.log(error);
+      const model = {
+        dbError: true,
+      };
+      response.render("review.hbs", model);
     } else {
       response.redirect("/faqs");
     }
@@ -241,35 +283,69 @@ app.post("/faq/delete/:id", function (request, response) {
 });
 
 app.get("/faqs/create-faq", function (request, response) {
-  response.render("create-faq.hbs");
-})
+  if (!request.session.isLoggedIn) {
+    response.redirect("/login");
+  } else {
+    response.render("create-faq.hbs");
+  }
+});
 
 app.post("/faqs/create-faq", function (request, response) {
   const question = request.body.question;
   const answer = request.body.answer;
-  const query = "INSERT INTO faq (question, answer) VALUES (?, ?)";
-  const values = [question, answer];
 
-  db.run(query, values, function (error) {
-    if (error) {
-      //display error
-    } else {
-      response.redirect("/faqs");
-    }
-  });
+  const errorMessages = getErrorMessagesForFaqs(question, answer);
+
+  if (!request.session.isLoggedIn) {
+    errorMessages.push(AUTHORIZATION_ERROR_MESSAGE);
+  }
+  if (errorMessages.length == 0) {
+    const query = "INSERT INTO faq (question, answer) VALUES (?, ?)";
+    const values = [question, answer];
+
+    db.run(query, values, function (error) {
+      if (error) {
+        errorMessages.push(DATABASE_ERROR_MESSAGE);
+        const model = {
+          errorMessages,
+          question,
+          answer,
+        };
+        response.render("create-faq.hbs", model);
+      } else {
+        response.redirect("/faqs");
+      }
+    });
+  } else {
+    const model = {
+      errorMessages,
+      question,
+      answer,
+    };
+    response.render("create-faq.hbs", model);
+  }
 });
 
 app.get("/update-faq/:id", function (request, response) {
   const id = request.params.id;
+
+  if (!request.session.isLoggedIn) {
+    response.redirect("/login");
+  }
 
   const query = "SELECT * FROM faq WHERE id = ?";
   const values = [id];
 
   db.get(query, values, function (error, faq) {
     if (error) {
-      //display error
+      const model = {
+        dbError: true,
+        faq,
+      };
+      response.render("update-faq.hbs", model);
     } else {
       const model = {
+        dbError: false,
         faq,
       }
       response.render("update-faq.hbs", model);
@@ -282,17 +358,42 @@ app.post("/update-faq/:id", function (request, response) {
   const updatedAnswer = request.body.answer;
   const id = request.params.id;
 
-  const query = "UPDATE faq SET question = ?, answer = ? WHERE id = ?";
-  const values = [updatedQuestion, updatedAnswer, id];
+  const errorMessages = getErrorMessagesForFaqs(updatedQuestion, updatedAnswer);
 
-  db.run(query, values, function (error) {
-    if (error) {
-      //display error
-    } else {
-      response.redirect("/faqs");
-    }
-  })
-})
+  if (!request.session.isLoggedIn) {
+    errorMessages.push(AUTHORIZATION_ERROR_MESSAGE);
+  }
+
+  if (errorMessages.length == 0) {
+    const query = "UPDATE faq SET question = ?, answer = ? WHERE id = ?";
+    const values = [updatedQuestion, updatedAnswer, id];
+
+    db.run(query, values, function (error) {
+      if (error) {
+        errorMessages.push(DATABASE_ERROR_MESSAGE);
+        const model = {
+          errorMessages,
+          faq: {
+            question: updatedQuestion,
+            answer: updatedAnswer,
+          },
+        };
+        response.render("update-faq.hbs", model);
+      } else {
+        response.redirect("/faqs");
+      }
+    });
+  } else {
+    const model = {
+      errorMessages,
+      faq: {
+        question: updatedQuestion,
+        answer: updatedAnswer,
+      },
+    };
+    response.render("update-faq.hbs", model);
+  }
+});
 
 function getErrorMessagesForReviews(name, description, grade) {
   const errorMessages = [];

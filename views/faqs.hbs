@@ -1,27 +1,33 @@
 <div id="create-review">
   <h1 class="my-h1"><strong>FAQ</strong></h1>
-  {{#if isLoggedIn}}
-  <a id="button-style-a" href="/faqs/create-faq">Create FAQ</a>
-  {{/if}}
-  <div class="faq-container">
-    {{#if faqs}}
-      <ul>
-        {{#each faqs}}
-          <div class="faq-question">
-            <h3>Q .</h3>
-            <h4 id="my-h4">{{question}}</h4>
-          </div>
-          <div class="faq-answer">
-            <h3>A .</h3>
-            <h4 id="answer-h4">{{answer}}</h4>
-          </div>
-          {{#if ../isLoggedIn}}
-            <div class="edit-button">
-              <a id="button-style-a" href="/faq/{{id}}">Edit</a>
-            </div>
-          {{/if}}
-        {{/each}}
-      </ul>
+  {{#if dbError}}
+    <p>Error: Internal server error</p>
+  {{else}}
+    {{#if isLoggedIn}}
+      <a id="button-style-a" href="/faqs/create-faq">Create FAQ</a>
     {{/if}}
-  </div>
+    <div class="faq-container">
+      {{#if faqs}}
+        <ul>
+          {{#each faqs}}
+            <div class="faq-question">
+              <h3>Q .</h3>
+              <h4 id="my-h4">{{question}}</h4>
+            </div>
+            <div class="faq-answer">
+              <h3>A .</h3>
+              <h4 id="answer-h4">{{answer}}</h4>
+            </div>
+            {{#if ../isLoggedIn}}
+              <div class="edit-button">
+                <a id="button-style-a" href="/faq/{{id}}">Edit</a>
+              </div>
+            {{/if}}
+          {{/each}}
+        </ul>
+      {{else}}
+        <p>There are no FAQ's at the moment</p>
+      {{/if}}
+    </div>
+  {{/if}}
 </div>
