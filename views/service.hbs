@@ -1,4 +1,7 @@
 <div id="services">
+  {{#if dbError}}
+    <p class="my-p">Error: Internal server error</p>
+  {{/if}}
   {{#if isLoggedIn}}
     <div class="container">
       <div class="specific-list">

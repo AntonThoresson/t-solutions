@@ -20,6 +20,11 @@ const FAQ_QUESTION_MIN_LENGTH = 5;
 const FAQ_ANSWER_MAX_LENGTH = 300;
 const FAQ_ANSWER_MIN_LENGTH = 2;
 
+const SERVICE_NAME_MAX_LENGTH = 50;
+const SERVICE_NAME_MIN_LENGTH = 5;
+const SERVICE_DESCRIPTION_MAX_LENGTH = 300;
+const SERVICE_DESCRIPTION_MIN_LENGTH = 10;
+
 const db = new sqlite3.Database("tsolutions-database.db");
 
 db.run(`
@@ -94,14 +99,36 @@ app.get("/about", function (request, response) {
   response.render("about.hbs");
 });
 
+function getErrorMessagesForServices(name, description) {
+  const errorMessages = [];
+
+  if (name.length > SERVICE_NAME_MAX_LENGTH) {
+    errorMessages.push("Error: Name may at most be " + SERVICE_NAME_MAX_LENGTH + " characters long");
+  } else if (name.length < SERVICE_NAME_MIN_LENGTH) {
+    errorMessages.push("Error: Name can't be less than " + SERVICE_NAME_MIN_LENGTH + " characters long");
+  }
+
+  if (description.length > SERVICE_DESCRIPTION_MAX_LENGTH) {
+    errorMessages.push("Error: Description may at most be " + SERVICE_DESCRIPTION_MAX_LENGTH + " characters long");
+  } else if (description.length < SERVICE_DESCRIPTION_MIN_LENGTH) {
+    errorMessages.push("Error: Description can't be less than " + SERVICE_DESCRIPTION_MIN_LENGTH + " characters long");
+  }
+  return errorMessages;
+}
+
 app.get("/services", function (request, response) {
   const query = "SELECT * FROM services";
 
   db.all(query, function (error, services) {
     if (error){
-      //display error
+      const model = {
+        dbError: true,
+        services,
+      };
+      response.render("services.hbs", model);
     } else {
       const model = {
+        dbError: false,
         services,
       };
       response.render("services.hbs", model);
@@ -110,37 +137,70 @@ app.get("/services", function (request, response) {
 });
 
 app.get("/services/create-service", function (request, response) {
-  response.render("create-service.hbs");
+  if (!request.session.isLoggedIn){
+    response.redirect("/login");
+  } else {
+    response.render("create-service.hbs");
+  }
 });
 
 app.post("/services/create-service", function (request, response) {
   const name = request.body.name;
   const description = request.body.description;
 
-  const query = "INSERT INTO services (name, description) VALUES (?, ?)";
-  const values =[name, description];
+  const errorMessages = getErrorMessagesForServices(name, description);
 
-  db.run(query, values, function (error) {
-    if (error){
-      //display error
-    } else {
-      response.redirect("/services");
-    }
-  });
+  if (!request.session.isLoggedIn) {
+    errorMessages.push(AUTHORIZATION_ERROR_MESSAGE);
+  }
+
+  if (errorMessages.length == 0) {
+    const query = "INSERT INTO services (name, description) VALUES (?, ?)";
+    const values = [name, description];
+
+    db.run(query, values, function (error) {
+      if (error) {
+        errorMessages.push(DATABASE_ERROR_MESSAGE);
+        const model = {
+          errorMessages,
+          name,
+          description,
+        };
+        response.render("create-service.hbs", model);
+      } else {
+        response.redirect("/services");
+      }
+    });
+  } else {
+    const model = {
+      errorMessages,
+      name,
+      description,
+    };
+    response.render("create-service.hbs", model);
+  }
 });
 
 app.get("/service/:id", function (request, response) {
   const id = request.params.id;
 
+  if (!request.session.isLoggedIn){
+    response.redirect("/login");
+  }
 
   const query = "SELECT * FROM services WHERE id = ?";
   const values = [id];
 
   db.get(query, values, function (error, service) {
     if (error) {
-      //display error
+      const model = {
+        dbError: true,
+        service,
+      };
+      response.render("service.hbs", model)
     } else {
       const model = {
+        dbError: false,
         service,
       };
       response.render("service.hbs", model);
@@ -150,30 +210,45 @@ app.get("/service/:id", function (request, response) {
 
 app.post("/service/delete/:id", function (request, response) {
   const id = request.params.id;
-
+ if (request.session.isLoggedIn) {
   const query = "DELETE FROM services WHERE id = ?";
   const values = [id];
 
   db.run(query, values, function (error) {
     if (error) {
-      //display error
+      const model = {
+        dbError: true,
+      };
+      response.render("service.hbs", model);
     } else {
       response.redirect("/services");
     }
   });
+} else {
+  response.redirect("/login")
+}
 });
 
 app.get("/update-service/:id", function (request, response) {
   const id = request.params.id;
+
+  if (!request.session.isLoggedIn) {
+    response.redirect("/login");
+  }
 
   const query = "SELECT * FROM services WHERE id = ?";
   const values = [id];
 
   db.get(query, values, function (error, service) {
     if (error) {
-      //display error
+      const model = {
+        dbError: true,
+        service,
+      };
+      response.render("update-service.hbs", model)
     } else {
       const model = {
+        dbError: false,
         service,
       };
       response.render("update-service.hbs", model);
@@ -186,16 +261,41 @@ app.post("/update-service/:id", function (request, response) {
   const updatedDescription = request.body.description;
   const id = request.params.id;
 
-  const query = "UPDATE services SET name = ?, description = ? WHERE id = ?";
-  const values = [updatedName, updatedDescription, id];
+  const errorMessages = getErrorMessagesForServices(updatedName, updatedDescription);
 
-  db.run(query, values, function (error) {
-    if (error) {
-      //display error
-    } else {
-      response.redirect("/services");
-    }
-  });
+  if (!request.session.isLoggedIn) {
+    errorMessages.push(AUTHORIZATION_ERROR_MESSAGE);
+  }
+
+  if (errorMessages.length == 0) {
+    const query = "UPDATE services SET name = ?, description = ? WHERE id = ?";
+    const values = [updatedName, updatedDescription, id];
+
+    db.run(query, values, function (error) {
+      if (error) {
+        errorMessages.push(DATABASE_ERROR_MESSAGE);
+        const model = {
+          errorMessages,
+          service: {
+            name: updatedName,
+            description: updatedDescription,
+          },
+        };
+        response.render("update-service.hbs", model);
+      } else {
+        response.redirect("/services");
+      }
+    });
+  } else {
+    const model = {
+      errorMessages,
+      service: {
+        name: updatedName,
+        description: updatedDescription,
+      },
+    };
+    response.render("update-service.hbs", model);
+  }
 });
 
 function getErrorMessagesForFaqs(question, answer) {

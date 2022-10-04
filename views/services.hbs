@@ -1,27 +1,33 @@
 <div id="services">
   <div class="container">
     <h1 class="my-h1"><strong>SERVICES</strong></h1>
-    {{#if isLoggedIn}}
-      <div class="create-service-button">
-        <a id="button-style-a" href="/services/create-service">Create Service</a>
-      </div>
-    {{/if}}
-    {{#if services}}
-      <div class="list">
-        {{#each services}}
-          <div>
-            <h2>{{name}}</h2>
-            <p>{{description}}</p>
-            {{#if ../isLoggedIn}}
-              <a id="button-style-a" href="/service/{{id}}">Edit</a>
-            {{/if}}
-            <p class="button-style-p"><a
-                id="button-style-a"
-                href="/contact"
-              >ORDER NOW</a></p>
-          </div>
-        {{/each}}
-      </div>
+    {{#if dbError}}
+      <p class="my-p">Error: Internal server error</p>
+    {{else}}
+      {{#if isLoggedIn}}
+        <div class="create-service-button">
+          <a id="button-style-a" href="/services/create-service">Create Service</a>
+        </div>
+      {{/if}}
+      {{#if services}}
+        <div class="list">
+          {{#each services}}
+            <div>
+              <h2>{{name}}</h2>
+              <p>{{description}}</p>
+              {{#if ../isLoggedIn}}
+                <a id="button-style-a" href="/service/{{id}}">Edit</a>
+              {{/if}}
+              <p class="button-style-p"><a
+                  id="button-style-a"
+                  href="/contact"
+                >ORDER NOW</a></p>
+            </div>
+          {{/each}}
+        </div>
+      {{else}}
+        <p class="my-p">There are no available services at the moment</p>
+      {{/if}}
     {{/if}}
   </div>
 </div>

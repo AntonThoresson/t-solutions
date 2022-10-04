@@ -1,8 +1,7 @@
 <div id="create-review">
   <h1 class="my-h1"><strong>CREATE SERVICE</strong></h1>
-  
-    {{#if errorMessages.length}}
-    <p>Couldn't create the review because:</p>
+
+  {{#if errorMessages.length}}
     <ul>
       {{#each errorMessages}}
         <li>{{this}}</li>
@@ -18,6 +17,7 @@
         type="text"
         id="input-name"
         name="name"
+        value="{{name}}"
         placeholder="Name"
       />
     </div>
@@ -30,11 +30,11 @@
         id="input-review"
         placeholder="Description"
         rows="3"
-      ></textarea>
+      >{{description}}</textarea>
     </div>
 
     <div id="post">
-      <input type="submit" value="Post">
+      <input type="submit" value="Post" />
     </div>
   </form>
 </div>
