@@ -367,19 +367,23 @@ app.get("/faq/:id", function (request, response) {
 app.post("/faq/delete/:id", function (request, response) {
   const id = request.params.id;
 
-  const query = "DELETE FROM faq WHERE id = ?";
-  const values = [id];
+  if (request.session.isLoggedIn) {
+    const query = "DELETE FROM faq WHERE id = ?";
+    const values = [id];
 
-  db.run(query, values, function (error) {
-    if (error) {
-      const model = {
-        dbError: true,
-      };
-      response.render("review.hbs", model);
-    } else {
-      response.redirect("/faqs");
-    }
-  });
+    db.run(query, values, function (error) {
+      if (error) {
+        const model = {
+          dbError: true,
+        };
+        response.render("review.hbs", model);
+      } else {
+        response.redirect("/faqs");
+      }
+    });
+  } else {
+    response.redirect("/login");
+  }
 });
 
 app.get("/faqs/create-faq", function (request, response) {
@@ -586,19 +590,23 @@ app.post("/reviews/create-review", function (request, response) {
 app.post("/review/delete/:id", function (request, response) {
   const id = request.params.id;
 
-  const query = "DELETE FROM reviews WHERE id = ?";
-  const values = [id];
+  if (request.session.isLoggedIn) {
+    const query = "DELETE FROM reviews WHERE id = ?";
+    const values = [id];
 
-  db.run(query, values, function (error) {
-    if (error) {
-      const model = {
-        dbError: true,
-      };
-      response.render("review.hbs", model);
-    } else {
-      response.redirect("/reviews");
-    }
-  });
+    db.run(query, values, function (error) {
+      if (error) {
+        const model = {
+          dbError: true,
+        };
+        response.render("review.hbs", model);
+      } else {
+        response.redirect("/reviews");
+      }
+    });
+  } else {
+    response.redirect("/login");
+  }
 });
 
 app.get("/review/:id", function (request, response) {
@@ -700,14 +708,6 @@ app.get("/contact", function (request, response) {
 
 app.get("/login", function (request, response) {
   response.render("login.hbs");
-});
-
-app.get("/secret-page", function (request, response) {
-  if (isLoggedIn == true) {
-    //send back secret page
-  } else {
-    //send back error
-  }
 });
 
 app.post("/login", function (request, response) {
