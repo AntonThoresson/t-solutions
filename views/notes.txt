@@ -1,0 +1,40 @@
+security notes:
+- sessions hijacking 
+
+create db.js
+- send/retrive sql queries to the db
+- call from the app.js
+- in db.js require sqlite, const db = new Sqlite, all the tables as well
+ex:
+function getAllMovies(callback){
+  const query = ""
+  db.all(query, function(error, movies){
+    callback(error, moveis)
+  })
+}
+- in app.js - getAllMovies(function(error, movies){
+  const errorMesseges etc etc ...
+  ....
+  ....
+  ...
+  if (error){
+    .....
+  }
+
+})
+
+to be able to use it in app.js - exports.getAllMovies = function(title, grade, callback)
+- in app.js - require("./db.js")
+- pass local variables through db function
+- ex db.createMovie(title, grade, function(error){
+  callback(error)
+})
+
+////////////////////////////////////////////////////
+
+create folder routers
+create movie-routers.js
+- const express = require(express)
+const router = express.Router()
+module.exports = router
+- in app.js - const moviesRouter = require(filepath to the router) - app.use("/moveis", moviesRouter)
