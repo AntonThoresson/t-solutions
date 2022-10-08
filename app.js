@@ -2,7 +2,6 @@ const express = require("express");
 const expressHandlebars = require("express-handlebars");
 const expressSession = require("express-session");
 const bcrypt = require("bcrypt");
-const db = require("./db.js") 
 
 const serviceRouter = require("./routers/service-router")
 const faqRouter = require("./routers/faq-router")
