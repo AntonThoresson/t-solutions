@@ -1,8 +1,8 @@
 const express = require("express");
 const expressHandlebars = require("express-handlebars");
-const sqlite3 = require("sqlite3");
 const expressSession = require("express-session");
 const bcrypt = require("bcrypt");
+const db = require("./db.js") 
 
 const REVIEW_NAME_MAX_LENGTH = 50;
 const REVIEW_NAME_MIN_LENGTH = 2;
@@ -25,33 +25,6 @@ const SERVICE_NAME_MAX_LENGTH = 50;
 const SERVICE_NAME_MIN_LENGTH = 5;
 const SERVICE_DESCRIPTION_MAX_LENGTH = 300;
 const SERVICE_DESCRIPTION_MIN_LENGTH = 10;
-
-const db = new sqlite3.Database("tsolutions-database.db");
-
-db.run(`
-  CREATE TABLE IF NOT EXISTS reviews (
-    id INTEGER PRIMARY KEY,
-    name TEXT,
-    description TEXT,
-    grade INTEGER
-  )
-`);
-
-db.run(`
-  CREATE TABLE IF NOT EXISTS faq (
-    id INTEGER PRIMARY KEY,
-    question TEXT,
-    answer TEXT
-  )
-`);
-
-db.run(`
-  CREATE TABLE IF NOT EXISTS services (
-    id INTEGER PRIMARY KEY,
-    name TEXT,
-    description TEXT
-  )
-`);
 
 const app = express();
 
@@ -118,10 +91,8 @@ function getErrorMessagesForServices(name, description) {
 }
 
 app.get("/services", function (request, response) {
-  const query = "SELECT * FROM services";
-
-  db.all(query, function (error, services) {
-    if (error){
+  db.getAllServices(function (error, services) {
+    if (error) {
       const model = {
         dbError: true,
         services,
@@ -156,10 +127,7 @@ app.post("/services/create-service", function (request, response) {
   }
 
   if (errorMessages.length == 0) {
-    const query = "INSERT INTO services (name, description) VALUES (?, ?)";
-    const values = [name, description];
-
-    db.run(query, values, function (error) {
+    db.createService(name, description, function (error) {
       if (error) {
         errorMessages.push(DATABASE_ERROR_MESSAGE);
         const model = {
@@ -185,20 +153,17 @@ app.post("/services/create-service", function (request, response) {
 app.get("/service/:id", function (request, response) {
   const id = request.params.id;
 
-  if (!request.session.isLoggedIn){
+  if (!request.session.isLoggedIn) {
     response.redirect("/login");
   }
 
-  const query = "SELECT * FROM services WHERE id = ?";
-  const values = [id];
-
-  db.get(query, values, function (error, service) {
+  db.getServiceById(id, function (error, service) {
     if (error) {
       const model = {
         dbError: true,
         service,
       };
-      response.render("service.hbs", model)
+      response.render("service.hbs", model);
     } else {
       const model = {
         dbError: false,
@@ -211,23 +176,20 @@ app.get("/service/:id", function (request, response) {
 
 app.post("/service/delete/:id", function (request, response) {
   const id = request.params.id;
- if (request.session.isLoggedIn) {
-  const query = "DELETE FROM services WHERE id = ?";
-  const values = [id];
-
-  db.run(query, values, function (error) {
-    if (error) {
-      const model = {
-        dbError: true,
-      };
-      response.render("service.hbs", model);
-    } else {
-      response.redirect("/services");
-    }
-  });
-} else {
-  response.redirect("/login")
-}
+  if (request.session.isLoggedIn) {
+    db.deleteServiceById(id, function (error) {
+      if (error) {
+        const model = {
+          dbError: true,
+        };
+        response.render("service.hbs", model);
+      } else {
+        response.redirect("/services");
+      }
+    });
+  } else {
+    response.redirect("/login");
+  }
 });
 
 app.get("/update-service/:id", function (request, response) {
@@ -237,16 +199,13 @@ app.get("/update-service/:id", function (request, response) {
     response.redirect("/login");
   }
 
-  const query = "SELECT * FROM services WHERE id = ?";
-  const values = [id];
-
-  db.get(query, values, function (error, service) {
+  db.getServiceById(id, function (error, service) {
     if (error) {
       const model = {
         dbError: true,
         service,
       };
-      response.render("update-service.hbs", model)
+      response.render("update-service.hbs", model);
     } else {
       const model = {
         dbError: false,
@@ -269,10 +228,9 @@ app.post("/update-service/:id", function (request, response) {
   }
 
   if (errorMessages.length == 0) {
-    const query = "UPDATE services SET name = ?, description = ? WHERE id = ?";
-    const values = [updatedName, updatedDescription, id];
 
-    db.run(query, values, function (error) {
+
+    db.updateServiceById(updatedName, updatedDescription, id, function (error) {
       if (error) {
         errorMessages.push(DATABASE_ERROR_MESSAGE);
         const model = {
@@ -318,9 +276,7 @@ function getErrorMessagesForFaqs(question, answer) {
 }
 
 app.get("/faqs", function (request, response) {
-  const query = "SELECT * FROM faq";
-
-  db.all(query, function (error, faqs) {
+  db.getAllFAQS(function (error, faqs) {
     if (error) {
       const model = {
         dbError: true,
@@ -345,10 +301,7 @@ app.get("/faq/:id", function (request, response) {
     response.redirect("/login");
   }
 
-  const query = "SELECT * FROM faq WHERE id = ?";
-  const values = [id];
-
-  db.get(query, values, function (error, faq) {
+  db.getFAQById(id, function (error, faq) {
     if (error) {
       const model = {
         dbError: true,
@@ -369,10 +322,9 @@ app.post("/faq/delete/:id", function (request, response) {
   const id = request.params.id;
 
   if (request.session.isLoggedIn) {
-    const query = "DELETE FROM faq WHERE id = ?";
-    const values = [id];
 
-    db.run(query, values, function (error) {
+
+    db.deleteFAQById(id, function (error) {
       if (error) {
         const model = {
           dbError: true,
@@ -405,10 +357,7 @@ app.post("/faqs/create-faq", function (request, response) {
     errorMessages.push(AUTHORIZATION_ERROR_MESSAGE);
   }
   if (errorMessages.length == 0) {
-    const query = "INSERT INTO faq (question, answer) VALUES (?, ?)";
-    const values = [question, answer];
-
-    db.run(query, values, function (error) {
+    db.createFAQ(question, answer, function (error) {
       if (error) {
         errorMessages.push(DATABASE_ERROR_MESSAGE);
         const model = {
@@ -441,7 +390,7 @@ app.get("/update-faq/:id", function (request, response) {
   const query = "SELECT * FROM faq WHERE id = ?";
   const values = [id];
 
-  db.get(query, values, function (error, faq) {
+  db.getFAQById(id, function (error, faq) {
     if (error) {
       const model = {
         dbError: true,
@@ -470,10 +419,7 @@ app.post("/update-faq/:id", function (request, response) {
   }
 
   if (errorMessages.length == 0) {
-    const query = "UPDATE faq SET question = ?, answer = ? WHERE id = ?";
-    const values = [updatedQuestion, updatedAnswer, id];
-
-    db.run(query, values, function (error) {
+    db.updateFAQById(updatedQuestion, updatedAnswer, id, function (error) {
       if (error) {
         errorMessages.push(DATABASE_ERROR_MESSAGE);
         const model = {
@@ -524,8 +470,7 @@ function getErrorMessagesForReviews(name, description, grade) {
 }
 
 app.get("/reviews", function (request, response) {
-  const query = "SELECT id, name, description, grade FROM reviews";
-  db.all(query, function (error, reviews) {
+  db.getAllReviews(function (error, reviews) {
     if (error) {
       const model = {
         dbError: true,
@@ -555,14 +500,9 @@ app.post("/reviews/create-review", function (request, response) {
   const errorMessages = getErrorMessagesForReviews(name, description, grade);
 
   if (errorMessages.length == 0) {
-    const query =
-      "INSERT INTO reviews (name, description, grade) VALUES (?, ?, ?)";
-    const values = [name, description, grade];
-
-    db.run(query, values, function (error) {
+    db.createReview(name, description, grade, function (error) {
       if (error) {
         errorMessages.push(DATABASE_ERROR_MESSAGE);
-
         const model = {
           errorMessages,
           name,
@@ -592,10 +532,7 @@ app.post("/review/delete/:id", function (request, response) {
   const id = request.params.id;
 
   if (request.session.isLoggedIn) {
-    const query = "DELETE FROM reviews WHERE id = ?";
-    const values = [id];
-
-    db.run(query, values, function (error) {
+    db.deleteReviewById(id, function (error) {
       if (error) {
         const model = {
           dbError: true,
@@ -612,11 +549,7 @@ app.post("/review/delete/:id", function (request, response) {
 
 app.get("/review/:id", function (request, response) {
   const id = request.params.id;
-
-  const query = "SELECT * FROM reviews WHERE id = ?";
-  const values = [id];
-
-  db.get(query, values, function (error, review) {
+  db.getReviewById(id, function (error, review) {
     if (error) {
       const model = {
         dbError: true,
@@ -638,10 +571,7 @@ app.get("/update-review/:id", function (request, response) {
   if(!request.session.isLoggedIn){
     response.redirect("/login");
   }
-  const query = "SELECT * FROM reviews WHERE id = ?";
-  const values = [id];
-
-  db.get(query, values, function (error, review) {
+  db.getReviewById(id, function (error, review) {
     if (error){
       const model = {
         dbError: true,
@@ -670,11 +600,7 @@ app.post("/update-review/:id", function (request, response) {
   }
   
   if (errorMessages.length == 0) {
-    const query =
-      "UPDATE reviews SET name = ?, description = ?, grade = ? WHERE id = ?";
-    const values = [updatedName, updatedDescription, updatedGrade, id];
-
-    db.run(query, values, function (error) {
+    db.updateReviewById(updatedName, updatedDescription, updatedGrade, id, function (error) {
       if (error) {
         errorMessages.push(DATABASE_ERROR_MESSAGE);
         const model = {
