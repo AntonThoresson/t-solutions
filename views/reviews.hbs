@@ -1,6 +1,6 @@
 <div id="reviews">
   <h1 class="my-h1"><strong>REVIEWS</strong></h1>
-  <a id="button-style-a" href="/reviews/create-review">Add a Review</a>
+  <a id="button-style-a" href="/reviews/create">Add a Review</a>
 </div>
 <div class="review-container">
   {{#if dbError}}
@@ -16,7 +16,7 @@
             <p>Grade: {{grade}}/10</p>
             <div>
               <p>
-                <a id="button-style-a" class="review-a" href="/review/{{id}}">Read Review</a>
+                <a id="button-style-a" class="review-a" href="/reviews/{{id}}">Read Review</a>
               </p>
             </div>
           </div>
