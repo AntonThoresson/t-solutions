@@ -2,6 +2,7 @@ const express = require("express");
 const expressHandlebars = require("express-handlebars");
 const sqlite3 = require("sqlite3");
 const expressSession = require("express-session");
+const bcrypt = require("bcrypt");
 
 const REVIEW_NAME_MAX_LENGTH = 50;
 const REVIEW_NAME_MIN_LENGTH = 2;
@@ -10,7 +11,7 @@ const REVIEW_GRADE_MIN = 0;
 const REVIEW_DESCRIPTION_MAX_LENGTH = 500;
 
 const ADMIN_USERNAME = "tsolutions";
-const ADMIN_PASSWORD = "password";
+const ADMIN_PASSWORD = "$2b$10$AG3N/Bg2Ygd4I/dx1GbKIOSzK9qqnPm8ytew5NCIKZrQ6JbAvtFhG";
 
 const DATABASE_ERROR_MESSAGE = "Error: Internal server error";
 const AUTHORIZATION_ERROR_MESSAGE = "Error: You don't have admin access";
@@ -714,7 +715,7 @@ app.post("/login", function (request, response) {
   const username = request.body.username;
   const password = request.body.password;
 
-  if (username == ADMIN_USERNAME && password == ADMIN_PASSWORD) {
+  if (username == ADMIN_USERNAME && bcrypt.compareSync(password, ADMIN_PASSWORD)) {
     request.session.isLoggedIn = true;
     response.redirect("/");
   } else {
