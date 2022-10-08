@@ -4,7 +4,7 @@
     <p>Error: Internal server error</p>
   {{else}}
     {{#if isLoggedIn}}
-      <a id="button-style-a" href="/faqs/create-faq">Create FAQ</a>
+      <a id="button-style-a" href="/faqs/create">Create FAQ</a>
     {{/if}}
     <div class="faq-container">
       {{#if faqs}}
@@ -20,7 +20,7 @@
             </div>
             {{#if ../isLoggedIn}}
               <div class="edit-button">
-                <a id="button-style-a" href="/faq/{{id}}">Edit</a>
+                <a id="button-style-a" href="/faqs/{{id}}">Edit</a>
               </div>
             {{/if}}
           {{/each}}

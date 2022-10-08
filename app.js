@@ -4,6 +4,7 @@ const expressSession = require("express-session");
 const bcrypt = require("bcrypt");
 const db = require("./db.js") 
 const serviceRouter = require("./routers/service-router")
+const faqRouter = require("./routers/faq-router")
 
 const REVIEW_NAME_MAX_LENGTH = 50;
 const REVIEW_NAME_MIN_LENGTH = 2;
@@ -14,10 +15,7 @@ const REVIEW_DESCRIPTION_MAX_LENGTH = 500;
 const ADMIN_USERNAME = "tsolutions";
 const ADMIN_PASSWORD = "$2b$10$AG3N/Bg2Ygd4I/dx1GbKIOSzK9qqnPm8ytew5NCIKZrQ6JbAvtFhG";
 
-const FAQ_QUESTION_MAX_LENGTH = 300;
-const FAQ_QUESTION_MIN_LENGTH = 5;
-const FAQ_ANSWER_MAX_LENGTH = 300;
-const FAQ_ANSWER_MIN_LENGTH = 2;
+
 
 const app = express();
 
@@ -60,201 +58,14 @@ app.use(function (request, response, next) {
 
 app.use("/services", serviceRouter);
 
+app.use("/faqs", faqRouter);
+
 app.get("/", function (request, response) {
   response.render("home.hbs");
 });
 
 app.get("/about", function (request, response) {
   response.render("about.hbs");
-});
-
-function getErrorMessagesForFaqs(question, answer) {
-  const errorMessages = [];
-
-  if (question.length > FAQ_QUESTION_MAX_LENGTH) {
-    errorMessages.push("Error: Question may at most be " + FAQ_QUESTION_MAX_LENGTH + " characters long");
-  } else if (question.length < FAQ_ANSWER_MIN_LENGTH) {
-    errorMessages.push("Error: Question can't be less than " + FAQ_QUESTION_MIN_LENGTH + " characters long");
-  }
-
-  if (answer.length > FAQ_ANSWER_MAX_LENGTH) {
-    errorMessages.push("Error: Answer may at most be " + FAQ_ANSWER_MAX_LENGTH + " characters long");
-  } else if (answer.length < FAQ_ANSWER_MIN_LENGTH) {
-    errorMessages.push("Error: Answer can't be less than " + FAQ_ANSWER_MIN_LENGTH +  " charcters long");
-  }
-
-  return errorMessages;
-}
-
-app.get("/faqs", function (request, response) {
-  db.getAllFAQS(function (error, faqs) {
-    if (error) {
-      const model = {
-        dbError: true,
-        faqs,
-      };
-      response.render("faqs.hbs", model);
-    } else {
-      const model = {
-        dbError: false,
-        faqs,
-      };
-      response.render("faqs.hbs", model);
-    }
-  });
-});
-
-
-app.get("/faq/:id", function (request, response) {
-  const id = request.params.id;
-
-  if (!request.session.isLoggedIn) {
-    response.redirect("/login");
-  }
-
-  db.getFAQById(id, function (error, faq) {
-    if (error) {
-      const model = {
-        dbError: true,
-        faq,
-      };
-      response.render("faq.hbs", model);
-    } else {
-      const model = {
-        dbError: false,
-        faq,
-      };
-      response.render("faq.hbs", model);
-    }
-  });
-});
-
-app.post("/faq/delete/:id", function (request, response) {
-  const id = request.params.id;
-
-  if (request.session.isLoggedIn) {
-
-
-    db.deleteFAQById(id, function (error) {
-      if (error) {
-        const model = {
-          dbError: true,
-        };
-        response.render("review.hbs", model);
-      } else {
-        response.redirect("/faqs");
-      }
-    });
-  } else {
-    response.redirect("/login");
-  }
-});
-
-app.get("/faqs/create-faq", function (request, response) {
-  if (!request.session.isLoggedIn) {
-    response.redirect("/login");
-  } else {
-    response.render("create-faq.hbs");
-  }
-});
-
-app.post("/faqs/create-faq", function (request, response) {
-  const question = request.body.question;
-  const answer = request.body.answer;
-
-  const errorMessages = getErrorMessagesForFaqs(question, answer);
-
-  if (!request.session.isLoggedIn) {
-    errorMessages.push(AUTHORIZATION_ERROR_MESSAGE);
-  }
-  if (errorMessages.length == 0) {
-    db.createFAQ(question, answer, function (error) {
-      if (error) {
-        errorMessages.push(DATABASE_ERROR_MESSAGE);
-        const model = {
-          errorMessages,
-          question,
-          answer,
-        };
-        response.render("create-faq.hbs", model);
-      } else {
-        response.redirect("/faqs");
-      }
-    });
-  } else {
-    const model = {
-      errorMessages,
-      question,
-      answer,
-    };
-    response.render("create-faq.hbs", model);
-  }
-});
-
-app.get("/update-faq/:id", function (request, response) {
-  const id = request.params.id;
-
-  if (!request.session.isLoggedIn) {
-    response.redirect("/login");
-  }
-
-  const query = "SELECT * FROM faq WHERE id = ?";
-  const values = [id];
-
-  db.getFAQById(id, function (error, faq) {
-    if (error) {
-      const model = {
-        dbError: true,
-        faq,
-      };
-      response.render("update-faq.hbs", model);
-    } else {
-      const model = {
-        dbError: false,
-        faq,
-      }
-      response.render("update-faq.hbs", model);
-    }
-  })
-})
-
-app.post("/update-faq/:id", function (request, response) {
-  const updatedQuestion = request.body.question;
-  const updatedAnswer = request.body.answer;
-  const id = request.params.id;
-
-  const errorMessages = getErrorMessagesForFaqs(updatedQuestion, updatedAnswer);
-
-  if (!request.session.isLoggedIn) {
-    errorMessages.push(AUTHORIZATION_ERROR_MESSAGE);
-  }
-
-  if (errorMessages.length == 0) {
-    db.updateFAQById(updatedQuestion, updatedAnswer, id, function (error) {
-      if (error) {
-        errorMessages.push(DATABASE_ERROR_MESSAGE);
-        const model = {
-          errorMessages,
-          faq: {
-            question: updatedQuestion,
-            answer: updatedAnswer,
-          },
-        };
-        response.render("update-faq.hbs", model);
-      } else {
-        response.redirect("/faqs");
-      }
-    });
-  } else {
-    const model = {
-      errorMessages,
-      faq: {
-        question: updatedQuestion,
-        answer: updatedAnswer,
-      },
-    };
-    response.render("update-faq.hbs", model);
-  }
 });
 
 function getErrorMessagesForReviews(name, description, grade) {
