@@ -3,6 +3,7 @@ const expressHandlebars = require("express-handlebars");
 const expressSession = require("express-session");
 const bcrypt = require("bcrypt");
 const db = require("./db.js") 
+const serviceRouter = require("./routers/service-router")
 
 const REVIEW_NAME_MAX_LENGTH = 50;
 const REVIEW_NAME_MIN_LENGTH = 2;
@@ -13,18 +14,10 @@ const REVIEW_DESCRIPTION_MAX_LENGTH = 500;
 const ADMIN_USERNAME = "tsolutions";
 const ADMIN_PASSWORD = "$2b$10$AG3N/Bg2Ygd4I/dx1GbKIOSzK9qqnPm8ytew5NCIKZrQ6JbAvtFhG";
 
-const DATABASE_ERROR_MESSAGE = "Error: Internal server error";
-const AUTHORIZATION_ERROR_MESSAGE = "Error: You don't have admin access";
-
 const FAQ_QUESTION_MAX_LENGTH = 300;
 const FAQ_QUESTION_MIN_LENGTH = 5;
 const FAQ_ANSWER_MAX_LENGTH = 300;
 const FAQ_ANSWER_MIN_LENGTH = 2;
-
-const SERVICE_NAME_MAX_LENGTH = 50;
-const SERVICE_NAME_MIN_LENGTH = 5;
-const SERVICE_DESCRIPTION_MAX_LENGTH = 300;
-const SERVICE_DESCRIPTION_MIN_LENGTH = 10;
 
 const app = express();
 
@@ -65,196 +58,14 @@ app.use(function (request, response, next) {
   next();
 });
 
+app.use("/services", serviceRouter);
+
 app.get("/", function (request, response) {
   response.render("home.hbs");
 });
 
 app.get("/about", function (request, response) {
   response.render("about.hbs");
-});
-
-function getErrorMessagesForServices(name, description) {
-  const errorMessages = [];
-
-  if (name.length > SERVICE_NAME_MAX_LENGTH) {
-    errorMessages.push("Error: Name may at most be " + SERVICE_NAME_MAX_LENGTH + " characters long");
-  } else if (name.length < SERVICE_NAME_MIN_LENGTH) {
-    errorMessages.push("Error: Name can't be less than " + SERVICE_NAME_MIN_LENGTH + " characters long");
-  }
-
-  if (description.length > SERVICE_DESCRIPTION_MAX_LENGTH) {
-    errorMessages.push("Error: Description may at most be " + SERVICE_DESCRIPTION_MAX_LENGTH + " characters long");
-  } else if (description.length < SERVICE_DESCRIPTION_MIN_LENGTH) {
-    errorMessages.push("Error: Description can't be less than " + SERVICE_DESCRIPTION_MIN_LENGTH + " characters long");
-  }
-  return errorMessages;
-}
-
-app.get("/services", function (request, response) {
-  db.getAllServices(function (error, services) {
-    if (error) {
-      const model = {
-        dbError: true,
-        services,
-      };
-      response.render("services.hbs", model);
-    } else {
-      const model = {
-        dbError: false,
-        services,
-      };
-      response.render("services.hbs", model);
-    }
-  });
-});
-
-app.get("/services/create-service", function (request, response) {
-  if (!request.session.isLoggedIn){
-    response.redirect("/login");
-  } else {
-    response.render("create-service.hbs");
-  }
-});
-
-app.post("/services/create-service", function (request, response) {
-  const name = request.body.name;
-  const description = request.body.description;
-
-  const errorMessages = getErrorMessagesForServices(name, description);
-
-  if (!request.session.isLoggedIn) {
-    errorMessages.push(AUTHORIZATION_ERROR_MESSAGE);
-  }
-
-  if (errorMessages.length == 0) {
-    db.createService(name, description, function (error) {
-      if (error) {
-        errorMessages.push(DATABASE_ERROR_MESSAGE);
-        const model = {
-          errorMessages,
-          name,
-          description,
-        };
-        response.render("create-service.hbs", model);
-      } else {
-        response.redirect("/services");
-      }
-    });
-  } else {
-    const model = {
-      errorMessages,
-      name,
-      description,
-    };
-    response.render("create-service.hbs", model);
-  }
-});
-
-app.get("/service/:id", function (request, response) {
-  const id = request.params.id;
-
-  if (!request.session.isLoggedIn) {
-    response.redirect("/login");
-  }
-
-  db.getServiceById(id, function (error, service) {
-    if (error) {
-      const model = {
-        dbError: true,
-        service,
-      };
-      response.render("service.hbs", model);
-    } else {
-      const model = {
-        dbError: false,
-        service,
-      };
-      response.render("service.hbs", model);
-    }
-  });
-});
-
-app.post("/service/delete/:id", function (request, response) {
-  const id = request.params.id;
-  if (request.session.isLoggedIn) {
-    db.deleteServiceById(id, function (error) {
-      if (error) {
-        const model = {
-          dbError: true,
-        };
-        response.render("service.hbs", model);
-      } else {
-        response.redirect("/services");
-      }
-    });
-  } else {
-    response.redirect("/login");
-  }
-});
-
-app.get("/update-service/:id", function (request, response) {
-  const id = request.params.id;
-
-  if (!request.session.isLoggedIn) {
-    response.redirect("/login");
-  }
-
-  db.getServiceById(id, function (error, service) {
-    if (error) {
-      const model = {
-        dbError: true,
-        service,
-      };
-      response.render("update-service.hbs", model);
-    } else {
-      const model = {
-        dbError: false,
-        service,
-      };
-      response.render("update-service.hbs", model);
-    }
-  });
-});
-
-app.post("/update-service/:id", function (request, response) {
-  const updatedName = request.body.name;
-  const updatedDescription = request.body.description;
-  const id = request.params.id;
-
-  const errorMessages = getErrorMessagesForServices(updatedName, updatedDescription);
-
-  if (!request.session.isLoggedIn) {
-    errorMessages.push(AUTHORIZATION_ERROR_MESSAGE);
-  }
-
-  if (errorMessages.length == 0) {
-
-
-    db.updateServiceById(updatedName, updatedDescription, id, function (error) {
-      if (error) {
-        errorMessages.push(DATABASE_ERROR_MESSAGE);
-        const model = {
-          errorMessages,
-          service: {
-            name: updatedName,
-            description: updatedDescription,
-          },
-        };
-        response.render("update-service.hbs", model);
-      } else {
-        response.redirect("/services");
-      }
-    });
-  } else {
-    const model = {
-      errorMessages,
-      service: {
-        name: updatedName,
-        description: updatedDescription,
-      },
-    };
-    response.render("update-service.hbs", model);
-  }
 });
 
 function getErrorMessagesForFaqs(question, answer) {

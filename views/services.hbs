@@ -6,7 +6,7 @@
     {{else}}
       {{#if isLoggedIn}}
         <div class="create-service-button">
-          <a id="button-style-a" href="/services/create-service">Create Service</a>
+          <a id="button-style-a" href="/services/create">Create Service</a>
         </div>
       {{/if}}
       {{#if services}}
@@ -16,7 +16,7 @@
               <h2>{{name}}</h2>
               <p>{{description}}</p>
               {{#if ../isLoggedIn}}
-                <a id="button-style-a" href="/service/{{id}}">Edit</a>
+                <a id="button-style-a" href="/services/{{id}}">Edit</a>
               {{/if}}
               <p class="button-style-p"><a
                   id="button-style-a"

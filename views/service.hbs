@@ -9,10 +9,10 @@
           <h2>{{service.name}}</h2>
           <p>{{service.description}}</p>
           <div id="service-edit">
-          <form action="/service/delete/{{service.id}}" method="POST">
+          <form action="/services/delete/{{service.id}}" method="POST">
             <input type="submit" value="Delete" />
           </form>
-          <a id="button-style-a" href="/update-service/{{service.id}}">Update</a>
+          <a id="button-style-a" href="/services/update/{{service.id}}">Update</a>
           </div>
         </div>
       </div>
