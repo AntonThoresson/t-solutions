@@ -8,19 +8,12 @@ const serviceRouter = require("./routers/service-router")
 const faqRouter = require("./routers/faq-router")
 const reviewRouter = require("./routers/review-router")
 
-
-
 const ADMIN_USERNAME = "tsolutions";
 const ADMIN_PASSWORD = "$2b$10$AG3N/Bg2Ygd4I/dx1GbKIOSzK9qqnPm8ytew5NCIKZrQ6JbAvtFhG";
-
-
 
 const app = express();
 
 const path = require("path");
-const { get } = require("https");
-const { brotliDecompress } = require("zlib");
-const { response } = require("express");
 
 app.engine(
   "hbs",
@@ -67,17 +60,6 @@ app.get("/", function (request, response) {
 app.get("/about", function (request, response) {
   response.render("about.hbs");
 });
-
-
-
-
-
-
-
-
-
-
-
 
 app.get("/contact", function (request, response) {
   response.render("contact.hbs");
