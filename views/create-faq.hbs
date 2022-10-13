@@ -1,13 +1,12 @@
 <div id="create-review">
   <h1 class="my-h1"><strong>CREATE FAQ</strong></h1>
-  
-    {{#if errorMessages.length}}
-    <p>Couldn't create the review because:</p>
-    <ul>
-      {{#each errorMessages}}
-        <li>{{this}}</li>
-      {{/each}}
-    </ul>
+
+  {{#if errorMessages.length}}
+  <ul>
+    {{#each errorMessages}}
+    <li>{{this}}</li>
+    {{/each}}
+  </ul>
   {{/if}}
 
   <form method="POST">
@@ -39,4 +38,3 @@
     </div>
   </form>
 </div>
-<!-- Måste adda säkerhet som isLoggedIn -->

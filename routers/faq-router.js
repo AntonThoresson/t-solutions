@@ -115,8 +115,6 @@ router.post("/delete/:id", function (request, response) {
   const id = request.params.id;
 
   if (request.session.isLoggedIn) {
-
-
     db.deleteFAQById(id, function (error) {
       if (error) {
         const model = {
@@ -153,11 +151,11 @@ router.get("/update/:id", function (request, response) {
       const model = {
         dbError: false,
         faq,
-      }
+      };
       response.render("update-faq.hbs", model);
     }
-  })
-})
+  });
+});
 
 router.post("/update/:id", function (request, response) {
   const updatedQuestion = request.body.question;

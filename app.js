@@ -83,4 +83,9 @@ app.post("/login", function (request, response) {
   }
 });
 
+app.post("/logout", function (request, response) {
+  request.session.isLoggedIn = false;
+  response.redirect("/");
+});
+
 app.listen(6969);

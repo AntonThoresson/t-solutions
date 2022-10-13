@@ -24,6 +24,9 @@
         {{#unless isLoggedIn}}
           <li id="my-li"><a id="button-style-a" href="/login">Login</a></li>
         {{/unless}}
+        {{#if isLoggedIn}}
+          <li id="my-li"><form action="/logout" method="POST"><input type="submit" value="Logout"></form></li>
+        {{/if}}
       </ul>
     </nav>
 
