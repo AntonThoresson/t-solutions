@@ -39,12 +39,13 @@ router.get("/", function (request, response) {
     if (error) {
       const model = {
         dbError: true,
+        reviews,
       };
       response.render("reviews.hbs", model);
     } else {
       const model = {
-        reviews,
         dbError: false,
+        reviews,
       };
       response.render("reviews.hbs", model);
     }
@@ -139,12 +140,13 @@ router.get("/update/:id", function (request, response) {
     if (error){
       const model = {
         dbError: true,
+        review,
       };
       response.render("update-review.hbs", model);
     } else {
       const model = {
-        review,
         dbError: false,
+        review,
       };
     response.render("update-review.hbs", model);
     }
