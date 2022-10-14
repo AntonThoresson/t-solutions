@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const db = require("../review-db-operations")
+const db = require("../database-operations/review-db-operations")
 
 const REVIEW_NAME_MAX_LENGTH = 50;
 const REVIEW_NAME_MIN_LENGTH = 2;

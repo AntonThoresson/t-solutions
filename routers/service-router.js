@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const db = require("../service-db-operations")
+const db = require("../database-operations/service-db-operations")
 
 const SERVICE_NAME_MAX_LENGTH = 50;
 const SERVICE_NAME_MIN_LENGTH = 5;

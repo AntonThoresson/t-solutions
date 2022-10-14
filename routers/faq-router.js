@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const db = require("../faq-db-operations")
+const db = require("../database-operations/faq-db-operations")
 
 const FAQ_QUESTION_MAX_LENGTH = 300;
 const FAQ_QUESTION_MIN_LENGTH = 5;
