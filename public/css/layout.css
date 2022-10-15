@@ -124,6 +124,12 @@ input {
   width: 100%;
 }
 
+@media only screen and (max-width: 600px) {
+  .about-col-2 img {
+    display: none;
+  }
+}
+
 .about-text {
   margin-right: 15%;
 }
