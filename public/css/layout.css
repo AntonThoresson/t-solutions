@@ -121,11 +121,11 @@ input {
 }
 
 .about-col-2 img {
-  width: 80%;
+  width: 100%;
 }
 
 .about-text {
-  margin-right: 30%;
+  margin-right: 15%;
 }
 
 /* Services layout */
