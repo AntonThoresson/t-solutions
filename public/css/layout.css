@@ -289,7 +289,11 @@ input {
 
 #input-name,
 #input-review {
-  width: 20%;
+  width: 310px;
+}
+
+#form-select {
+  width: 180px;
 }
 
 #post {
