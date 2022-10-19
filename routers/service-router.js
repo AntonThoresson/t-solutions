@@ -46,7 +46,7 @@ router.get("/", function (request, response) {
 });
 
 router.get("/create", function (request, response) {
-  if (!request.session.isLoggedIn){
+  if (!request.session.isLoggedIn) {
     response.redirect("/login");
   } else {
     response.render("create-service.hbs");
@@ -113,6 +113,7 @@ router.get("/:id", function (request, response) {
 
 router.post("/delete/:id", function (request, response) {
   const id = request.params.id;
+
   if (request.session.isLoggedIn) {
     db.deleteServiceById(id, function (error) {
       if (error) {
@@ -165,8 +166,6 @@ router.post("/update/:id", function (request, response) {
   }
 
   if (errorMessages.length == 0) {
-
-
     db.updateServiceById(updatedName, updatedDescription, id, function (error) {
       if (error) {
         errorMessages.push(DATABASE_ERROR_MESSAGE);

@@ -23,7 +23,7 @@ exports.createService = function (name, description, callback) {
 
   db.run(query, values, function (error) {
     callback(error);
-  })
+  });
 };
 
 exports.getServiceById = function (id, callback) {

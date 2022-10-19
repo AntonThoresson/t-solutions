@@ -24,7 +24,7 @@ function getErrorMessagesForFaqs(question, answer) {
   } else if (answer.length < FAQ_ANSWER_MIN_LENGTH) {
     errorMessages.push("Error: Answer can't be less than " + FAQ_ANSWER_MIN_LENGTH +  " charcters long");
   }
-
+  
   return errorMessages;
 }
 
@@ -63,6 +63,7 @@ router.post("/create", function (request, response) {
   if (!request.session.isLoggedIn) {
     errorMessages.push(AUTHORIZATION_ERROR_MESSAGE);
   }
+
   if (errorMessages.length == 0) {
     db.createFAQ(question, answer, function (error) {
       if (error) {
@@ -136,9 +137,6 @@ router.get("/update/:id", function (request, response) {
   if (!request.session.isLoggedIn) {
     response.redirect("/login");
   }
-
-  const query = "SELECT * FROM faq WHERE id = ?";
-  const values = [id];
 
   db.getFAQById(id, function (error, faq) {
     if (error) {

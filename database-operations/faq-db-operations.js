@@ -26,7 +26,7 @@ exports.createFAQ = function (question, answer, callback) {
   });
 };
 
-exports.getFAQById = function (id, callback){
+exports.getFAQById = function (id, callback) {
   const query = "SELECT * FROM faq WHERE id = ?";
   const values = [id];
 

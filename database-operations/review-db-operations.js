@@ -27,7 +27,7 @@ exports.createReview = function (name, description, grade, callback) {
   });
 };
 
-exports.getReviewById = function (id, callback){
+exports.getReviewById = function (id, callback) {
   const query = "SELECT * FROM reviews WHERE id = ?";
   const values = [id];
 
@@ -45,7 +45,7 @@ exports.deleteReviewById = function (id, callback) {
   });
 };
 
-exports.updateReviewById = function (updatedName, updatedDescription, updatedGrade,id, callback) {
+exports.updateReviewById = function (updatedName, updatedDescription, updatedGrade, id, callback) {
   const query = "UPDATE reviews SET name = ?, description = ?, grade = ? WHERE id = ?";
   const values = [updatedName, updatedDescription, updatedGrade, id];
 
