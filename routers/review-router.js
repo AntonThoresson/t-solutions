@@ -76,7 +76,6 @@ router.post("/create", function (request, response) {
           description,
           grade,
         };
-
         response.render("create-review.hbs", model);
       } else {
         response.redirect("/reviews");
@@ -89,13 +88,13 @@ router.post("/create", function (request, response) {
       description,
       grade,
     };
-
     response.render("create-review.hbs", model);
   }
 });
 
 router.get("/:id", function (request, response) {
   const id = request.params.id;
+
   db.getReviewById(id, function (error, review) {
     if (error) {
       const model = {
@@ -134,9 +133,11 @@ router.post("/delete/:id", function (request, response) {
 
 router.get("/update/:id", function (request, response) {
   const id = request.params.id;
+
   if(!request.session.isLoggedIn){
     response.redirect("/login");
   }
+
   db.getReviewById(id, function (error, review) {
     if (error){
       const model = {
