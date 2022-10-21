@@ -31,7 +31,6 @@ function getErrorMessagesForReviews(name, description, grade) {
   } else if (grade > REVIEW_GRADE_MAX) {
     errorMessages.push("Error: Grade may at most be 10");
   }
-  
   return errorMessages;
 }
 

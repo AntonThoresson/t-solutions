@@ -24,7 +24,6 @@ function getErrorMessagesForFaqs(question, answer) {
   } else if (answer.length < FAQ_ANSWER_MIN_LENGTH) {
     errorMessages.push("Error: Answer can't be less than " + FAQ_ANSWER_MIN_LENGTH +  " charcters long");
   }
-  
   return errorMessages;
 }
 
