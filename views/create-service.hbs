@@ -1,6 +1,5 @@
-<div id="create-review">
+<div id="resource-layout">
   <h1 class="my-h1"><strong>CREATE SERVICE</strong></h1>
-
   {{#if errorMessages.length}}
     <ul>
       {{#each errorMessages}}
@@ -8,7 +7,6 @@
       {{/each}}
     </ul>
   {{/if}}
-
   <form method="POST">
     <div class="form-group">
       <label class="form-label" for="input-example-1">Name</label>
@@ -21,7 +19,6 @@
         placeholder="Name"
       />
     </div>
-
     <div class="form-group">
       <label class="form-label">Description</label>
       <textarea
@@ -32,7 +29,6 @@
         rows="3"
       >{{description}}</textarea>
     </div>
-
     <div id="post">
       <input type="submit" value="Post" />
     </div>

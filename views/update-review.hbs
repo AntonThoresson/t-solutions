@@ -1,4 +1,4 @@
-<div id="create-review">
+<div id="resource-layout">
   {{#if errorMessages.length}}
     <ul>
       {{#each errorMessages}}
@@ -6,11 +6,9 @@
       {{/each}}
     </ul>
   {{/if}}
-
   {{#if dbError}}
     <p>Error: Internal server error</p>
   {{else}}
-
     {{#if isLoggedIn}}
       <form method="POST">
         <div class="form-group">
@@ -24,7 +22,6 @@
             placeholder="Name"
           />
         </div>
-
         <div class="form-group">
           <label class="form-label">Review</label>
           <textarea
@@ -35,7 +32,6 @@
             rows="3"
           >{{review.description}}</textarea>
         </div>
-
         <div class="form-group">
           <label class="form-label">Grade</label>
           <select class="form-select" name="grade" id="form-select">
@@ -53,7 +49,6 @@
             <option>10</option>
           </select>
         </div>
-
         <div id="post">
           <input type="submit" value="Update" />
         </div>

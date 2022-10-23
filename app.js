@@ -40,9 +40,7 @@ app.use(
 
 app.use(function (request, response, next) {
   const isLoggedIn = request.session.isLoggedIn;
-
   response.locals.isLoggedIn = isLoggedIn;
-
   next();
 });
 

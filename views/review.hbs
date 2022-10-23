@@ -2,7 +2,6 @@
   {{#if dbError}}
     <p>Error: Internal server error</p>
   {{else}}
-
     {{#if review}}
       <ul>
         <div class="review-list">
@@ -18,7 +17,7 @@
           <p>Grade: {{review.grade}}/10</p>
           {{#if isLoggedIn}}
             <div>
-              <a id="button-style-a" href="/reviews/update/{{review.id}}">Update Review</a>
+              <a id="button-style-a" href="/reviews/update/{{review.id}}">Update</a>
             </div>
             <div id="review-delete">
               <form action="/reviews/delete/{{review.id}}" method="POST">
