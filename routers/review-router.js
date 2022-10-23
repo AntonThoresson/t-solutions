@@ -56,8 +56,6 @@ router.get("/create", function (request, response) {
   response.render("create-review.hbs");
 });
 
-
-
 router.post("/create", function (request, response) {
   const name = request.body.name;
   const description = request.body.description;
